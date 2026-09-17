@@ -1,0 +1,183 @@
+[en-us]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita is a self-hosted digital library for comics, manga, books and magazines. Build libraries from any folder on the NAS (including TOS shared folders), then browse, organize and read in any browser with a fast built-in reader. Multi-user with roles and age ratings, reading progress sync, OPDS feeds and rich metadata management. The app opens in a new browser tab from the TOS desktop; the backend listens on loopback only, so no extra port is exposed and all traffic goes through the TOS web server route. Runs as a dedicated unprivileged user in a hardened systemd sandbox."
+release_note = "Bundles the official Kavita 0.9.1.4 build (self-contained .NET, no runtime dependencies). After install, open the app and complete the first-run wizard to create the admin account, then add library folders (default: /var/lib/kavita/library, or any folder readable by the kavita user, e.g. a TOS shared folder). OPDS is available at /kavita/opds for reader apps. Data is stored in /var/lib/kavita."
+important    = "The web UI has no default password: the first visitor runs the setup wizard and creates the admin account, so complete the setup right after installing. Databases, covers, caches and logs are stored in /var/lib/kavita; 'apt remove' keeps them, 'apt purge' deletes them (your comic/book source files in their own library folders are never touched)."
+
+[zh-cn]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita 是一款自托管的数字图书馆，面向漫画、Manga、电子书与杂志。把它指向 NAS 上任意目录（包括 TOS 共享文件夹）即可建库，随后在任何浏览器里整理与阅读，内置快速阅读器。支持多用户与角色权限、适龄分级、阅读进度同步、OPDS 订阅与丰富的元数据管理。应用从 TOS 桌面以新标签页方式打开；后端仅监听本机回环、不对外多开任何端口，全部流量经 TOS 网页服务的标准路由转发。服务以专用非特权用户运行并施加 systemd 沙箱加固。"
+release_note = "内置 Kavita 0.9.1.4 官方构建（.NET 自包含发布，无运行时依赖）。安装后打开应用，按首访向导创建管理员账号，再添加库目录（默认 /var/lib/kavita/library，也可指向 kavita 用户可读的任意目录，如共享文件夹）。阅读类 App 可通过 OPDS（/kavita/opds）订阅。数据库、封面、缓存与日志保存在 /var/lib/kavita。"
+important    = "网页界面没有默认密码：首位访问者通过向导创建管理员账号，请在安装后立即完成初始化。数据库、封面、缓存与日志保存在 /var/lib/kavita；apt remove 卸载时保留数据，apt purge 会彻底删除（库目录中的漫画/书籍源文件不受影响）。"
+
+[zh-hk]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita 是一款自架管的數碼圖書館，面向漫畫、Manga、電子書與雜誌。把它指向 NAS 上任意目錄（包括 TOS 共享資料夾）即可建庫，隨後在任何瀏覽器裡整理與閱讀，內建快速閱讀器。支援多使用者與角色權限、年齡分級、閱讀進度同步、OPDS 訂閱與豐富的中繼資料管理。應用從 TOS 桌面以新分頁方式開啟；後端僅監聽本機回環、不對外多開任何連接埠，全部流量經 TOS 網頁服務的標準路由轉發。服務以專用非特權使用者執行並施加 systemd 沙箱強化。"
+release_note = "內建 Kavita 0.9.1.4 官方构建（.NET 自包含發佈，無執行時相依）。安裝後開啟應用，按首訪精靈建立管理員帳號，再加入庫目錄（預設 /var/lib/kavita/library，也可指向 kavita 使用者可讀的任意目錄，如共享資料夾）。閱讀類 App 可透過 OPDS（/kavita/opds）訂閱。資料庫、封面、快取與日誌保存在 /var/lib/kavita。"
+important    = "網頁介面沒有預設密碼：首位訪客透過精靈建立管理員帳號，請在安裝後立即完成初始化。資料庫、封面、快取與日誌保存在 /var/lib/kavita；apt remove 移除時保留資料，apt purge 會徹底刪除（庫目錄中的漫畫/書籍來源檔案不受影響）。"
+
+[fr-fr]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita est une bibliothèque numérique auto-hébergée pour comics, mangas, livres et magazines. Créez des bibliothèques à partir de n'importe quel dossier du NAS (y compris les dossiers partagés TOS), puis parcourez, organisez et lisez dans n'importe quel navigateur avec un lecteur intégré rapide. Multi-utilisateurs avec rôles et classifications par âge, synchronisation de la progression de lecture, flux OPDS et gestion riche des métadonnées. L'application s'ouvre dans un nouvel onglet depuis le bureau TOS ; le backend n'écoute que sur loopback : aucun port supplémentaire n'est exposé, tout le trafic passe par la route standard du serveur web TOS. S'exécute sous un utilisateur dédié non privilégié dans un bac à sable systemd renforcé."
+release_note = "Embarque la build officielle Kavita 0.9.1.4 (.NET autonome, aucune dépendance d'exécution). Après l'installation, ouvrez l'application et terminez l'assistant de première exécution pour créer le compte administrateur, puis ajoutez des dossiers de bibliothèque (par défaut /var/lib/kavita/library, ou tout dossier lisible par l'utilisateur kavita, p. ex. un dossier partagé TOS). OPDS est disponible sur /kavita/opds pour les applications de lecture. Les données sont stockées dans /var/lib/kavita."
+important    = "L'interface web n'a pas de mot de passe par défaut : le premier visiteur lance l'assistant et crée le compte administrateur, terminez la configuration dès l'installation. Bases de données, couvertures, caches et journaux sont stockés dans /var/lib/kavita ; « apt remove » les conserve, « apt purge » les supprime (vos fichiers comics/livres dans leurs dossiers de bibliothèque ne sont jamais touchés)."
+
+[de-de]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita ist eine selbst gehostete digitale Bibliothek für Comics, Manga, Bücher und Magazine. Richten Sie Bibliotheken aus beliebigen Ordnern auf dem NAS ein (auch TOS-Freigabeordner), und durchsuchen, verwalten und lesen Sie sie dann in jedem Browser mit einem schnellen integrierten Reader. Mehrbenutzerbetrieb mit Rollen und Altersfreigaben, Synchronisation des Lesefortschritts, OPDS-Feeds und umfangreiche Metadatenverwaltung. Die App öffnet sich über das TOS-Desktop-Symbol in einem neuen Browser-Tab; das Backend lauscht nur auf Loopback: kein zusätzlicher offener Port, der gesamte Datenverkehr läuft über die Standardroute des TOS-Webservers. Läuft als dedizierter unprivilegierter Benutzer in einer gehärteten systemd-Sandbox."
+release_note = "Enthält das offizielle Kavita-0.9.1.4-Build (eigenständiges .NET, keine Laufzeitabhängigkeiten). Öffnen Sie nach der Installation die App, absolvieren Sie den Einrichtungsassistenten zum Anlegen des Admin-Kontos und fügen Sie dann Bibliotheksordner hinzu (Standard: /var/lib/kavita/library, oder jeder für den Benutzer kavita lesbare Ordner, z. B. ein TOS-Freigabeordner). OPDS ist unter /kavita/opds für Reader-Apps erreichbar. Daten liegen in /var/lib/kavita."
+important    = "Die Weboberfläche hat kein Standardpasswort: Der erste Besucher durchläuft den Assistenten und legt das Admin-Konto an – schließen Sie die Einrichtung direkt nach der Installation ab. Datenbanken, Cover, Caches und Protokolle liegen in /var/lib/kavita; „apt remove“ behält sie, „apt purge“ löscht sie (Ihre Comic-/Buch-Quelldateien in den Bibliotheksordnern werden nie angetastet)."
+
+[it-it]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita è una biblioteca digitale self-hosted per fumetti, manga, libri e riviste. Crea librerie da qualsiasi cartella sul NAS (incluse le cartelle condivise TOS), poi sfoglia, organizza e leggi in qualsiasi browser con un lettore integrato veloce. Multiutente con ruoli e restrizioni di età, sincronizzazione dei progressi di lettura, feed OPDS e ricca gestione dei metadati. L'app si apre in una nuova scheda dal desktop TOS; il backend ascolta solo su loopback: nessuna porta aggiuntiva esposta, tutto il traffico passa dalla route standard del server web TOS. Viene eseguito come utente dedicato non privilegiato in un sandbox systemd irrobustita."
+release_note = "Include la build ufficiale di Kavita 0.9.1.4 (.NET self-contained, nessuna dipendenza di runtime). Dopo l'installazione, apri l'app e completa la procedura guidata iniziale per creare l'account amministratore, poi aggiungi le cartelle delle librerie (predefinita: /var/lib/kavita/library, o qualsiasi cartella leggibile dall'utente kavita, p. es. una cartella condivisa TOS). OPDS è disponibile su /kavita/opds per le app di lettura. I dati sono conservati in /var/lib/kavita."
+important    = "L'interfaccia web non ha password predefinita: il primo visitatore esegue la procedura guidata e crea l'account amministratore, completare la configurazione subito dopo l'installazione. Database, copertine, cache e log sono conservati in /var/lib/kavita; «apt remove» li conserva, «apt purge» li elimina (i file sorgente di fumetti/libri nelle loro cartelle di libreria non vengono mai toccati)."
+
+[es-es]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita es una biblioteca digital autoalojada para cómics, manga, libros y revistas. Cree bibliotecas desde cualquier carpeta del NAS (incluidas las carpetas compartidas de TOS) y luego explore, organice y lea en cualquier navegador con un lector integrado rápido. Multiusuario con roles y clasificaciones por edad, sincronización del progreso de lectura, canales OPDS y una rica gestión de metadatos. La aplicación se abre en una pestaña nueva del escritorio de TOS; el backend solo escucha en loopback: no se expone ningún puerto adicional y todo el tráfico pasa por la ruta estándar del servidor web de TOS. Se ejecuta como usuario dedicado sin privilegios en un sandbox de systemd reforzado."
+release_note = "Incluye la compilación oficial de Kavita 0.9.1.4 (.NET autocontenido, sin dependencias de tiempo de ejecución). Tras la instalación, abra la aplicación y complete el asistente de primera ejecución para crear la cuenta de administrador; después añada carpetas de biblioteca (predeterminada: /var/lib/kavita/library, o cualquier carpeta legible por el usuario kavita, p. ej. una carpeta compartida de TOS). OPDS está disponible en /kavita/opds para apps de lectura. Los datos se guardan en /var/lib/kavita."
+important    = "La interfaz web no tiene contraseña predeterminada: el primer visitante ejecuta el asistente y crea la cuenta de administrador, complete la configuración justo después de instalar. Bases de datos, portadas, cachés y registros se guardan en /var/lib/kavita; «apt remove» los conserva, «apt purge» los elimina (los archivos de cómics/libros en sus carpetas de biblioteca nunca se tocan)."
+
+[hu-hu]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "A Kavita egy saját üzemeltetésű digitális könyvtár képregényekhez, mangákhoz, könyvekhez és magazinokhoz. Hozzon létre könyvtárakat a NAS bármely mappájából (a TOS megosztott mappákat is beleértve), majd böngésszen, szervezzen és olvasson bármely böngészőben egy gyors beépített olvasóval. Többfelhasználós mód szerepekkel és korhatár-besorolásokkal, olvasási haladás szinkronizálása, OPDS-hírcsatornák és gazdag metaadat-kezelés. Az alkalmazás új böngészőlapon nyílik meg a TOS asztalról; a háttérfolyamat csak loopbacken figyel: nincs kitett extra port, minden forgalom a TOS webszerver szabványos útvonalán megy át. Dedikált, nem privilegizált felhasználóként fut, megerősített systemd sandboxban."
+release_note = "A hivatalos Kavita 0.9.1.4 buildet tartalmazza (önmagában futó .NET, nincsenek futásidejű függőségek). Telepítés után nyissa meg az alkalmazást, fejezze be az első indítás varázslóját a rendszergazdai fiók létrehozásához, majd adjon hozzá könyvtármappákat (alapértelmezés: /var/lib/kavita/library, vagy bármilyen, a kavita felhasználó által olvasható mappa, pl. TOS megosztott mappa). Az OPDS a /kavita/opds címen érhető el olvasóalkalmazásokhoz. Az adatok a /var/lib/kavita-ban tárolódnak."
+important    = "A webes felületnek nincs alapértelmezett jelszava: az első látogató futtatja a varázslót és létrehozza a rendszergazdai fiókot, ezért a telepítés után azonnal fejezze be a beállítást. Az adatbázisok, borítók, gyorsítótárak és naplók a /var/lib/kavita-ban tárolódnak; az „apt remove” megőrzi őket, az „apt purge” törli őket (a képregény-/könyvforrásfájlokat a saját könyvtármappáikban soha nem érinti)."
+
+[ja-jp]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita はコミック・マンガ・電子書籍・雑誌向けのセルフホスト型デジタルライブラリです。NAS 上の任意のフォルダー（TOS 共有フォルダーを含む）からライブラリを作成し、高速な内蔵リーダーで任意のブラウザーから閲覧・整理・読書できます。ロールと年齢制限付きのマルチユーザー、読書進捗の同期、OPDS フィード、充実したメタデータ管理に対応。アプリは TOS デスクトップから新しいタブで開き、バックエンドはループバックのみで待ち受け、追加のポートは公開せず、すべての通信は TOS ウェブサーバーの標準ルートを経由します。専用の非特権ユーザーとして、強化された systemd サンドボックス内で動作します。"
+release_note = "公式 Kavita 0.9.1.4 ビルドを同梱（自己完結型 .NET、ランタイム依存なし）。インストール後、アプリを開いて初回セットアップウィザードで管理者アカウントを作成し、ライブラリフォルダーを追加してください（既定: /var/lib/kavita/library。kavita ユーザーが読み取れる任意のフォルダー、例えば TOS 共有フォルダーも可）。リーダーアプリからは OPDS（/kavita/opds）で利用できます。データは /var/lib/kavita に保存されます。"
+important    = "ウェブ UI に既定のパスワードはありません：最初の訪問者がウィザードを実行して管理者アカウントを作成するため、インストール直後にセットアップを完了してください。データベース・カバー・キャッシュ・ログは /var/lib/kavita に保存され、「apt remove」では保持、「apt purge」では削除されます（ライブラリフォルダー内のコミック/書籍のソースファイルは一切変更されません）。"
+
+[ko-kr]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita는 코믹, 만화, 전자책, 잡지를 위한 자체 호스팅 디지털 라이브러리입니다. NAS의 모든 폴더(TOS 공유 폴더 포함)로 라이브러리를 만들고, 빠른 내장 리더로 어떤 브라우저에서든 탐색·정리·독서할 수 있습니다. 역할과 연령 등급이 있는 다중 사용자, 읽기 진행 동기화, OPDS 피드, 풍부한 메타데이터 관리를 지원합니다. 앱은 TOS 데스크톱에서 새 탭으로 열리며, 백엔드는 루프백만 수신해 추가 포트를 노출하지 않고 모든 트래픽이 TOS 웹 서버의 표준 경로를 통과합니다. 전용 비특권 사용자로 강화된 systemd 샌드박스에서 실행됩니다."
+release_note = "공식 Kavita 0.9.1.4 빌드 포함(자립형 .NET, 런타임 종속성 없음). 설치 후 앱을 열어 첫 실행 마법사로 관리자 계정을 만든 다음, 라이브러리 폴더를 추가하세요(기본값: /var/lib/kavita/library, kavita 사용자가 읽을 수 있는 모든 폴더(예: TOS 공유 폴더)도 가능). 리더 앱은 OPDS(/kavita/opds)로 이용할 수 있습니다. 데이터는 /var/lib/kavita에 저장됩니다."
+important    = "웹 UI에는 기본 비밀번호가 없습니다. 첫 방문자가 마법사를 실행해 관리자 계정을 만들므로 설치 직후 설정을 완료하세요. 데이터베이스, 표지, 캐시, 로그는 /var/lib/kavita에 저장되며 'apt remove'는 유지, 'apt purge'는 삭제합니다(라이브러리 폴더의 코믹/책 원본 파일은 절대 건드리지 않습니다)."
+
+[pl-pl]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita to samodzielnie hostowana biblioteka cyfrowa dla komiksów, mang, książek i czasopism. Twórz biblioteki z dowolnego folderu na NAS (włącznie z folderami współdzielonymi TOS), a następnie przeglądaj, porządkuj i czytaj w dowolnej przeglądarce dzięki szybkiemu wbudowanemu czytnikowi. Obsługa wielu użytkowników z rolami i kategoriami wiekowymi, synchronizacja postępu czytania, kanały OPDS i rozbudowane zarządzanie metadanymi. Aplikacja otwiera się w nowej karcie z pulpitu TOS; backend nasłuchuje tylko na loopback: żaden dodatkowy port nie jest udostępniany, a cały ruch przechodzi przez standardową trasę serwera WWW TOS. Działa jako dedykowany użytkownik bez uprawnień we wzmocnionej piaskownicy systemd."
+release_note = "Zawiera oficjalną wersję Kavita 0.9.1.4 (samodzielne .NET, bez zależności środowiskowych). Po instalacji otwórz aplikację i ukończ kreator pierwszego uruchomienia, tworząc konto administratora, a następnie dodaj foldery bibliotek (domyślnie: /var/lib/kavita/library lub dowolny folder czytelny dla użytkownika kavita, np. folder współdzielony TOS). OPDS jest dostępny pod /kavita/opds dla aplikacji czytników. Dane są przechowywane w /var/lib/kavita."
+important    = "Interfejs WWW nie ma domyślnego hasła: pierwszy użytkownik uruchamia kreatora i tworzy konto administratora, dlatego ukończ konfigurację zaraz po instalacji. Bazy danych, okładki, pamięć podręczna i logi są przechowywane w /var/lib/kavita; „apt remove” je zachowuje, „apt purge” usuwa (pliki źródłowe komiksów/książek w ich folderach bibliotek nigdy nie są dotykane)."
+
+[ru-ru]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita — это самостоятельно размещаемая цифровая библиотека для комиксов, манги, книг и журналов. Создавайте библиотеки из любой папки на NAS (включая общие папки TOS), а затем просматривайте, упорядочивайте и читайте в любом браузере со встроенным быстрым ридером. Многопользовательский режим с ролями и возрастными ограничениями, синхронизация прогресса чтения, ленты OPDS и богатое управление метаданными. Приложение открывается в новой вкладке с рабочего стола TOS; серверная часть слушает только loopback: никаких дополнительных открытых портов, весь трафик идёт через стандартный маршрут веб-сервера TOS. Работает от имени выделенного непривилегированного пользователя в усиленной песочнице systemd."
+release_note = "Включает официальную сборку Kavita 0.9.1.4 (автономный .NET, без зависимостей среды выполнения). После установки откройте приложение и пройдите мастер первого запуска, чтобы создать учётную запись администратора, затем добавьте папки библиотек (по умолчанию: /var/lib/kavita/library или любая папка, читаемая пользователем kavita, например общая папка TOS). OPDS доступен по адресу /kavita/opds для приложений-читалок. Данные хранятся в /var/lib/kavita."
+important    = "Веб-интерфейс не имеет пароля по умолчанию: первый посетитель запускает мастер и создаёт учётную запись администратора — завершите настройку сразу после установки. Базы данных, обложки, кэши и журналы хранятся в /var/lib/kavita; «apt remove» сохраняет их, «apt purge» удаляет (исходные файлы комиксов/книг в их папках библиотек никогда не затрагиваются)."
+
+[tr-tr]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita; çizgi romanlar, mangalar, kitaplar ve dergiler için kendi sunucunuzda barındırılan dijital bir kütüphanedir. NAS üzerindeki herhangi bir klasörden (TOS paylaşılan klasörleri dahil) kütüphaneler oluşturun, ardından hızlı yerleşik okuyucuyla herhangi bir tarayıcıda göz atın, düzenleyin ve okuyun. Roller ve yaş derecelendirmeleriyle çok kullanıcılı destek, okuma ilerlemesi eşitleme, OPDS akışları ve zengin üst veri yönetimi sunar. Uygulama TOS masaüstünden yeni bir sekmede açılır; arka uç yalnızca loopback dinler: ek bir port açılmaz, tüm trafik TOS web sunucusunun standart yolundan geçer. Ayrıcalıksız özel bir kullanıcı olarak güçlendirilmiş systemd korumalı alanında çalışır."
+release_note = "Resmî Kavita 0.9.1.4 derlemesini içerir (kendi kendine yeten .NET, çalışma zamanı bağımlılığı yok). Kurulumdan sonra uygulamayı açın, yönetici hesabını oluşturmak için ilk çalıştırma sihirbazını tamamlayın, ardından kütüphane klasörleri ekleyin (varsayılan: /var/lib/kavita/library veya kavita kullanıcısının okuyabileceği herhangi bir klasör, örn. TOS paylaşılan klasörü). Okuyucu uygulamaları için OPDS /kavita/opds adresinde mevcuttur. Veriler /var/lib/kavita içinde saklanır."
+important    = "Web arayüzünün varsayılan parolası yoktur: ilk ziyaretçi sihirbazı çalıştırıp yönetici hesabını oluşturur, bu yüzden kurulumdan hemen sonra kurulumu tamamlayın. Veritabanları, kapaklar, önbellekler ve günlükler /var/lib/kavita içinde saklanır; «apt remove» bunları korur, «apt purge» siler (kendi kütüphane klasörlerindeki çizgi roman/kitap kaynak dosyalarına asla dokunulmaz)."
+
+[pt-pt]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "O Kavita é uma biblioteca digital auto-hospedada para banda desenhada, manga, livros e revistas. Crie bibliotecas a partir de qualquer pasta no NAS (incluindo pastas partilhadas do TOS) e depois navegue, organize e leia em qualquer navegador com um leitor integrado rápido. Multiutilizador com funções e classificações etárias, sincronização do progresso de leitura, feeds OPDS e gestão avançada de metadados. A aplicação abre num novo separador a partir do ambiente de trabalho TOS; o backend escuta apenas em loopback: nenhum porto extra é exposto e todo o tráfego passa pela rota padrão do servidor web TOS. Corre como utilizador dedicado sem privilégios numa sandbox systemd reforçada."
+release_note = "Inclui a compilação oficial do Kavita 0.9.1.4 (.NET autónomo, sem dependências de runtime). Após a instalação, abra a aplicação e conclua o assistente de primeira execução para criar a conta de administrador e, em seguida, adicione pastas de biblioteca (predefinida: /var/lib/kavita/library, ou qualquer pasta legível pelo utilizador kavita, p. ex. uma pasta partilhada do TOS). O OPDS está disponível em /kavita/opds para aplicações de leitura. Os dados são guardados em /var/lib/kavita."
+important    = "A interface web não tem palavra-passe predefinida: o primeiro visitante executa o assistente e cria a conta de administrador, conclua a configuração logo após a instalação. Bases de dados, capas, caches e registos são guardados em /var/lib/kavita; o «apt remove» mantém-nos, o «apt purge» elimina-os (os ficheiros fonte de banda desenhada/livros nas suas pastas de biblioteca nunca são tocados)."
+
+[ar-sa]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita هي مكتبة رقمية ذاتية الاستضافة للقصص المصورة والمانجا والكتب والمجلات. أنشئ مكتبات من أي مجلد على NAS (بما في ذلك مجلدات TOS المشتركة)، ثم استعرض ونظّم واقرأ في أي متصفح باستخدام قارئ مدمج سريع. تدعم عدة مستخدمين مع أدوار وتصنيفات عمرية، ومزامنة تقدم القراءة، وخلاصات OPDS، وإدارة غنية للبيانات الوصفية. يفتح التطبيق في علامة تبويب جديدة من سطح مكتب TOS؛ يستمع الخادم على loopback فقط: لا يُفتح منفذ إضافي، وكل حركة المرور تمر عبر المسار القياسي لخادم ويب TOS. يعمل كمستخدم مخصص بدون امتيازات في بيئة معزولة مُحصّنة عبر systemd."
+release_note = "يتضمن بناء Kavita الرسمي 0.9.1.4 ‎(.NET مكتفٍ ذاتيًا، بلا تبعيات تشغيل). بعد التثبيت، افتح التطبيق وأكمل معالج التشغيل الأول لإنشاء حساب المسؤول، ثم أضف مجلدات المكتبات (الافتراضي: /var/lib/kavita/library، أو أي مجلد يمكن لمستخدم kavita قراءته، مثل مجلد مشترك في TOS). يتوفر OPDS على /kavita/opds لتطبيقات القراءة. تُخزَّن البيانات في /var/lib/kavita."
+important    = "لا توجد كلمة مرور افتراضية لواجهة الويب: أول زائر يشغّل المعالج وينشئ حساب المسؤول، لذا أكمل الإعداد مباشرة بعد التثبيت. تُخزَّن قواعد البيانات والأغلفة وذاكرات التخزين المؤقت والسجلات في /var/lib/kavita؛ يُبقيها «apt remove» بينما يحذفها «apt purge» (ملفات القصص المصورة/الكتب المصدرية في مجلدات مكتباتها لا تُمَس أبدًا)."
+
+[cs-cz]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita je vlastní digitální knihovna pro komiksy, mangu, knihy a časopisy. Vytvářejte knihovny z libovolné složky na NAS (včetně sdílených složek TOS) a poté prohlížejte, organizujte a čtěte v jakémkoli prohlížeči pomocí rychlého vestavěného čtečky. Víceuživatelský provoz s rolemi a věkovým hodnocením, synchronizace postupu čtení, kanály OPDS a bohatá správa metadat. Aplikace se otevírá v nové kartě z plochy TOS; backend naslouchá pouze na loopbacku: žádný další port není vystaven a veškerá komunikace prochází standardní trasou webového serveru TOS. Běží jako vyhrazený neprivilegovaný uživatel v zpevněném sandboxu systemd."
+release_note = "Obsahuje oficiální sestavení Kavita 0.9.1.4 (samostatné .NET, bez závislostí běhového prostředí). Po instalaci otevřete aplikaci a dokončete průvodce prvním spuštěním vytvořením účtu správce, poté přidejte složky knihoven (výchozí: /var/lib/kavita/library, nebo jakákoli složka čitelná uživatelem kavita, např. sdílená složka TOS). OPDS je k dispozici na /kavita/opds pro čtecí aplikace. Data jsou uložena v /var/lib/kavita."
+important    = "Webové rozhraní nemá výchozí heslo: první návštěvník spustí průvodce a vytvoří účet správce, dokončete nastavení hned po instalaci. Databáze, obálky, mezipaměti a protokoly jsou uloženy v /var/lib/kavita; „apt remove“ je zachová, „apt purge“ je smaže (zdrojové soubory komiksů/knih v jejich složkách knihoven nikdy nejsou dotčeny)."
+
+[he-il]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita היא ספרייה דיגיטלית המתארחת בעצמה עבור קומיקסים, מנגה, ספרים ומגזינים. צרו ספריות מכל תיקייה ב-NAS (לרבות תיקיות משותפות של TOS), ולאחר מכן עיינו, ארגנו וקראו בכל דפדפן עם קורא מובנה מהיר. ריבוי משתמשים עם תפקידים ודירוגי גיל, סנכרון התקדמות קריאה, הזנות OPDS וניהול מטא-דאטה עשיר. האפליקציה נפתחת בלשונית חדשה משולחן העבודה של TOS; הצד האחורי מאזין ב-loopback בלבד: לא נחשף פורט נוסף, וכל התעבורה עוברת בנתיב הסטנדרטי של שרת האינטרנט של TOS. פועלת כמשתמש ייעודי ללא הרשאות בארגז חול systemd מחוזק."
+release_note = "כוללת את הבילד הרשמי של Kavita 0.9.1.4 ‎(.NET עצמאי, ללא תלויות זמן ריצה). לאחר ההתקנה פתחו את האפליקציה והשלימו את אשף ההפעלה הראשונה ליצירת חשבון המנהל, ולאחר מכן הוסיפו תיקיות ספרייה (ברירת מחדל: /var/lib/kavita/library, או כל תיקייה שהמשתמש kavita יכול לקרוא, למשל תיקייה משותפת של TOS).‏ OPDS זמין ב-/kavita/opds לאפליקציות קריאה. הנתונים נשמרים ב-/var/lib/kavita."
+important    = "לממשק האינטרנט אין סיסמת ברירת מחדל: המבקר הראשון מריץ את האשף ויוצר את חשבון המנהל, לכן השלימו את ההגדרה מיד לאחר ההתקנה. מסדי נתונים, כריכות, מטמונים ויומנים נשמרים ב-/var/lib/kavita; ‏«apt remove» שומר אותם, «apt purge» מוחק אותם (קובצי המקור של קומיקסים/ספרים בתיקיות הספרייה שלהם לעולם אינם נוגעים)."
+
+[id-id]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita adalah pustaka digital yang di-hosting sendiri untuk komik, manga, buku, dan majalah. Buat pustaka dari folder mana pun di NAS (termasuk folder bersama TOS), lalu telusuri, atur, dan baca di peramban apa pun dengan pembaca bawaan yang cepat. Multi-pengguna dengan peran dan rating usia, sinkronisasi kemajuan membaca, umpan OPDS, dan pengelolaan metadata yang kaya. Aplikasi terbuka di tab baru dari desktop TOS; backend hanya mendengarkan di loopback: tidak ada port tambahan yang diekspos dan seluruh lalu lintas melewati rute standar server web TOS. Berjalan sebagai pengguna khusus tanpa hak istimewa dalam sandbox systemd yang diperkuat."
+release_note = "Menyertakan build resmi Kavita 0.9.1.4 (.NET mandiri, tanpa dependensi runtime). Setelah instal, buka aplikasi dan selesaikan wizard jalannya pertama untuk membuat akun admin, lalu tambahkan folder pustaka (bawaan: /var/lib/kavita/library, atau folder apa pun yang dapat dibaca pengguna kavita, mis. folder bersama TOS). OPDS tersedia di /kavita/opds untuk aplikasi pembaca. Data disimpan di /var/lib/kavita."
+important    = "Antarmuka web tidak memiliki kata sandi bawaan: pengunjung pertama menjalankan wizard dan membuat akun admin, sehingga selesaikan penyiapan segera setelah instal. Basis data, sampul, tembolok, dan log disimpan di /var/lib/kavita; 'apt remove' menyimpannya, 'apt purge' menghapusnya (berkas sumber komik/buku di folder pustakanya sendiri tidak pernah disentuh)."
+
+[nb-no]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita er et selvvert digitalt bibliotek for tegneserier, manga, bøker og blader. Opprett biblioteker fra enhver mappe på NAS-en (inkludert delte TOS-mapper), og bla gjennom, organiser og les i hvilken som helst nettleser med en rask innebygd leser. Flerbruker med roller og aldersgrenser, synkronisering av leseframdrift, OPDS-strømmer og rik metadatahåndtering. Appen åpnes i en ny fane fra TOS-skrivebordet; bakenden lytter kun på loopback: ingen ekstra port eksponeres, og all trafikk går via standardruten til TOS-nettserveren. Kjører som en dedikert uprivilegert bruker i en herdet systemd-sandkasse."
+release_note = "Inneholder den offisielle Kavita 0.9.1.4-bygget (.NET med alt inkludert, ingen runtime-avhengigheter). Etter installasjonen, åpne appen og fullfør førstekjøringsveiviseren for å opprette administratorkontoen, og legg deretter til bibliotekmapper (standard: /var/lib/kavita/library, eller enhver mappe som brukeren kavita kan lese, f.eks. en delt TOS-mappe). OPDS er tilgjengelig på /kavita/opds for leseapper. Data lagres i /var/lib/kavita."
+important    = "Nettgrensesnittet har ikke noe standardpassord: den første besøkende kjører veiviseren og oppretter administratorkontoen, så fullfør oppsettet rett etter installasjonen. Databaser, omslag, hurtigbuffere og logger lagres i /var/lib/kavita; «apt remove» beholder dem, «apt purge» sletter dem (kildefilene til tegneserier/bøker i sine egne bibliotekmapper berøres aldri)."
+
+[nl-nl]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita is een zelf gehoste digitale bibliotheek voor strips, manga, boeken en tijdschriften. Bouw bibliotheken vanuit elke map op de NAS (inclusief TOS-gedeelde mappen) en blader, organiseer en lees vervolgens in elke browser met een snelle ingebouwde lezer. Multi-user met rollen en leeftijdsclassificaties, synchronisatie van leesvoortgang, OPDS-feeds en uitgebreid metadata-beheer. De app opent in een nieuw tabblad vanaf het TOS-bureaublad; de backend luistert alleen op loopback: er wordt geen extra poort blootgesteld en al het verkeer loopt via de standaardroute van de TOS-webserver. Draait als een specifieke niet-geprivilegieerde gebruiker in een verhard systemd-sandbox."
+release_note = "Bevat de officiële Kavita 0.9.1.4-build (zelfstandige .NET, geen runtime-afhankelijkheden). Open na installatie de app en voltooi de wizard voor eerste gebruik om het beheerdersaccount aan te maken; voeg daarna bibliotheekmappen toe (standaard: /var/lib/kavita/library, of elke map die leesbaar is voor de gebruiker kavita, bijv. een TOS-gedeelde map). OPDS is beschikbaar op /kavita/opds voor lees-apps. Gegevens worden bewaard in /var/lib/kavita."
+important    = "De webinterface heeft geen standaardwachtwoord: de eerste bezoeker doorloopt de wizard en maakt het beheerdersaccount aan, voltooi de installatie dus direct na het installeren. Databases, omslagen, caches en logs worden bewaard in /var/lib/kavita; 'apt remove' bewaart ze, 'apt purge' verwijdert ze (de bronbestanden van strips/boeken in hun eigen bibliotheekmappen worden nooit aangeraakt)."
+
+[sv-se]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita är ett egenhostat digitalt bibliotek för serier, manga, böcker och tidningar. Skapa bibliotek från valfri mapp på NAS:en (inklusive TOS-delade mappar) och bläddra, organisera och läs sedan i valfri webbläsare med en snabb inbyggd läsare. Fleranvändarläge med roller och åldersgränser, synkronisering av läsframsteg, OPDS-flöden och rik metadatahantering. Appen öppnas i en ny flik från TOS-skrivbordet; bakänden lyssnar endast på loopback: ingen extra port exponeras och all trafik går via webbserverns standardrutt i TOS. Körs som en dedikerad opriviligerad användare i ett förstärkt systemd-sandlåda."
+release_note = "Innehåller den officiella Kavita 0.9.1.4-bygget (fristående .NET, inga runtime-beroenden). Efter installationen, öppna appen och slutför installationsguiden för att skapa administratörskontot, lägg sedan till biblioteksmappar (standard: /var/lib/kavita/library, eller valfri mapp som är läsbar för användaren kavita, t.ex. en TOS-delad mapp). OPDS finns på /kavita/opds för läsarappar. Data lagras i /var/lib/kavita."
+important    = "Webbgränssnittet har inget standardlösenord: den första besökaren kör guiden och skapar administratörskontot, slutför konfigurationen direkt efter installationen. Databaser, omslag, cachar och loggar lagras i /var/lib/kavita; »apt remove« behåller dem, »apt purge« raderar dem (seriernas/böckernas källfiler i sina egna biblioteksmappar röras aldrig)."
+
+[th-th]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita คือคลังสื่อดิจิทัลแบบ self-host สำหรับการ์ตูน มังงะ หนังสือ และนิตยสาร สร้างคลังจากโฟลเดอร์ใดก็ได้บน NAS (รวมถึงโฟลเดอร์แชร์ของ TOS) แล้วเรียกดู จัดระเบียบ และอ่านในเบราว์เซอร์ใดก็ได้ด้วยตัวอ่านในตัวที่เร็ว รองรับผู้ใช้หลายคนพร้อมสิทธิ์และการจัดเรตตามอายุ ซิงก์ความคืบหน้าการอ่าน ฟีด OPDS และการจัดการเมทาดาทาที่ครบครัน แอปเปิดในแท็บใหม่จากเดสก์ท็อป TOS ฝั่งเซิร์ฟเวอร์รับฟังเฉพาะ loopback จึงไม่เปิดพอร์ตเพิ่มเติม การรับส่งทั้งหมดผ่านเส้นทางมาตรฐานของเว็บเซิร์ฟเวอร์ TOS ทำงานในชื่อผู้ใช้เฉพาะแบบไร้สิทธิ์พิเศษในแซนด์บ็อกซ์ systemd ที่เข้มงวด"
+release_note = "รวมบิลด์ทางการของ Kavita 0.9.1.4 (.NET แบบ self-contained ไม่มี dependency ของ runtime) หลังติดตั้ง ให้เปิดแอปและทำตามตัวช่วยตั้งค่าครั้งแรกเพื่อสร้างบัญชีผู้ดูแล แล้วเพิ่มโฟลเดอร์คลัง (ค่าเริ่มต้น: /var/lib/kavita/library หรือโฟลเดอร์ใดก็ได้ที่ผู้ใช้ kavita อ่านได้ เช่น โฟลเดอร์แชร์ของ TOS) แอปอ่านหนังสือใช้ OPDS ได้ที่ /kavita/opds ข้อมูลถูกเก็บใน /var/lib/kavita"
+important    = "หน้าเว็บไม่มีรหัสผ่านเริ่มต้น ผู้เยี่ยมชมคนแรกจะเป็นผู้รันตัวช่วยและสร้างบัญชีผู้ดูแล จึงควรตั้งค่าให้เสร็จทันทีหลังติดตั้ง ฐานข้อมูล ปกหนังสือ แคช และ log เก็บอยู่ใน /var/lib/kavita คำสั่ง 'apt remove' จะเก็บข้อมูลไว้ ส่วน 'apt purge' จะลบทิ้ง (ไฟล์ต้นฉบับการ์ตูน/หนังสือในโฟลเดอร์คลังของตัวเองจะไม่ถูกแตะต้องเด็ดขาด)"
+
+[vi-vn]
+name         = "Kavita Reading Server"
+auth         = "Moechz"
+version      = "@@VERSION@@"
+descript     = "Kavita là thư viện số tự lưu trữ dành cho truyện tranh, manga, sách và tạp chí. Tạo thư viện từ bất kỳ thư mục nào trên NAS (kể cả thư mục chia sẻ của TOS), sau đó duyệt, sắp xếp và đọc trên mọi trình duyệt với trình đọc tích hợp nhanh chóng. Đa người dùng với vai trò và phân loại độ tuổi, đồng bộ tiến độ đọc, nguồn OPDS và quản lý siêu dữ liệu phong phú. Ứng dụng mở trong tab mới từ màn hình TOS; backend chỉ lắng nghe trên loopback: không mở thêm cổng nào và toàn bộ lưu lượng đi qua tuyến chuẩn của máy chủ web TOS. Chạy dưới người dùng chuyên dụng không đặc quyền trong sandbox systemd được gia cố."
+release_note = "Kèm bản dựng chính thức Kavita 0.9.1.4 (.NET tự chứa, không phụ thuộc runtime). Sau khi cài đặt, mở ứng dụng và hoàn thành trình hướng dẫn chạy lần đầu để tạo tài khoản quản trị, sau đó thêm thư mục thư viện (mặc định: /var/lib/kavita/library, hoặc bất kỳ thư mục nào người dùng kavita có thể đọc, ví dụ thư mục chia sẻ TOS). OPDS khả dụng tại /kavita/opds cho các ứng dụng đọc sách. Dữ liệu được lưu trong /var/lib/kavita."
+important    = "Giao diện web không có mật khẩu mặc định: khách truy cập đầu tiên chạy trình hướng dẫn và tạo tài khoản quản trị, vì vậy hãy hoàn tất thiết lập ngay sau khi cài đặt. Cơ sở dữ liệu, ảnh bìa, bộ nhớ đệm và nhật ký được lưu trong /var/lib/kavita; 'apt remove' giữ lại chúng, 'apt purge' xóa chúng (các tệp truyện/sách nguồn trong thư mục thư viện riêng của chúng không bao giờ bị ảnh hưởng)."

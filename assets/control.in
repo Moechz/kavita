@@ -1,0 +1,21 @@
+Package: kavita
+Version: @VERSION@
+Architecture: @ARCH@
+Maintainer: @MAINTAINER@
+Installed-Size: @SIZE@
+Depends: systemd
+Section: web
+Priority: optional
+Homepage: https://www.kavitareader.com
+Description: Kavita Reading Server - comics, manga, ebooks and magazines
+ Kavita is a self-hosted digital library for comics, manga, books and
+ magazines. Build libraries from any folder on the NAS (including TOS
+ shared folders), browse and read in any browser with a fast reader,
+ users and roles, age ratings, reading progress sync, OPDS access and
+ extensive metadata management.
+ .
+ The web UI opens in a new browser tab via the TOS App Center route
+ /kavita/. The backend listens on loopback only; no external port is
+ exposed. On first visit you create the admin account, then add your
+ library folders. Data (database, covers, cache, logs) lives in
+ /var/lib/kavita.
