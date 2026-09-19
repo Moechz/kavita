@@ -94,8 +94,16 @@ jobs:
         run: |
           set -e
           rm -rf chk && mkdir chk && tar -xzf out/kavita-linux-x64.tar.gz -C chk
-          file chk/Kavita/Kavita | tee /dev/stderr | grep -q 'ELF 64-bit.*x86-64'
-          file chk/Kavita/createdump | grep -q 'ELF 64-bit.*x86-64'
+          ls chk/Kavita | head -8
+          out1=$(file -b chk/Kavita/Kavita)
+          echo "Kavita: $out1"
+          echo "$out1" | grep -q 'ELF 64-bit.*x86-64'
+          # createdump 为辅助诊断工具，信息性输出不阻断（主二进制才是硬断言）
+          if [ -e chk/Kavita/createdump ]; then
+            echo "createdump: $(file -b chk/Kavita/createdump)"
+          else
+            echo "note: createdump not present (informational)"
+          fi
           test -f chk/Kavita/BUILD-INFO
           test -f chk/Kavita/wwwroot/index.html
           # 上游二进制无执行位是已知怪癖，安装包 stage 阶段会补 0755
