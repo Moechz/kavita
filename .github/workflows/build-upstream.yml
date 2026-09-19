@@ -46,13 +46,19 @@ jobs:
         with:
           node-version: 24
       - run: |
+          # 与上游 docker-build.sh/build.sh 的 BuildUI 逐字对齐：
+          # Angular 应用构建器输出在 dist/browser/，须扁平化拷入 wwwroot
+          # （release-workflow.yml 里的 rsync -a dist/ 是过时写法，会把
+          # browser/ 子目录整套拷进去，与官方发布 tarball 结构不符）
+          rm -rf ../../Kavita.Server/wwwroot/* || true
           cd UI/Web || exit
           echo 'Installing web dependencies'
           npm ci --legacy-peer-deps
           echo 'Building UI'
           npm run prod
           echo 'Copying back to Kavita wwwroot'
-          rsync -a dist/ ../../Kavita.Server/wwwroot/
+          mkdir -p ../../Kavita.Server/wwwroot
+          cp -R dist/browser/* ../../Kavita.Server/wwwroot
           cd ../ || exit
 
       - name: Compile dotnet app
