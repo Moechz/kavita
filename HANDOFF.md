@@ -15,9 +15,13 @@
 
 ## 3. 当前状态速览
 
-- 首包全流程已在 tnas-57 真机验证（安装/升级/卸载/路由/回环/API/OPDS 全绿，
-  详见 `docs/TASK_STATE.md` §3）；机器上保留 0.9.1.4-2 运行中。
-- 待办仅剩两个 GUI 闸门：浏览器首访向导冒烟、应用中心手动安装（坑 11）。
+- 2026-09-19 提审规范对齐整改完成（V6 源码自建 / C3 隐私政策 / S11 归档属主 /
+  V11 门禁 / 坑 49 署名 / 零网络扫描，详见 CHANGELOG 0.9.1.4-2 Changed）。
+- 公开仓库 https://github.com/Moechz/kavita 已建；CI build-upstream.yml 从上游
+  源码 tag 自建二进制（audit chain：源码 tag → workflow → Actions run →
+  SHA256SUMS → BUILD-INFO）。
+- 待办：CI 产物回填锚点 → 双架构重建 deb → 真机回归（含隐私政策路由 200）→
+  两个 GUI 闸门（浏览器首访向导 / 应用中心 sideload）。
 
 ## 4. 最重要的开放问题
 

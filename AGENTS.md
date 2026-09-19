@@ -20,8 +20,13 @@ AGENTS.md → HANDOFF.md → docs/TASK_STATE.md → docs/DESIGN_DECISIONS.md
 
 ## 3. 架构摘要
 
-1. 上游 linux-x64 / linux-arm64 tarball 解包（剔除上游 config/），整个运行时树
-   （Kavita 二进制 + wwwroot + I18N + Assets + EmailTemplates…）进 `/usr/local/kavita/bin/`。
+1. **二进制来源（审核 V6）**：公开仓库 `Moechz/kavita` 的 Actions 从上游源码
+   tag 自建（`build-upstream.yml`，步骤与上游 release-workflow.yml 逐字对齐：
+   Node 24 编 WebUI + monorepo-build.sh dotnet publish），产出 build-v<tag>
+   Release（含 SHA256SUMS）。fetch 双层互验（Release 清单 × config.env 锚点）；
+   tarball 自带 BUILD-INFO，verify 断言 built_from=source。
+2. 自建 tarball 解包，整个运行时树（Kavita 二进制 + wwwroot + I18N + Assets +
+   EmailTemplates…）进 `/usr/local/kavita/bin/`。
 2. Kavita 以 **进程 CWD** 解析一切：状态在 `$(CWD)/config/*`、静态资源在 `$(CWD)/wwwroot`。
    故 systemd `WorkingDirectory=/usr/local/kavita/bin`，其中 `bin/config` 是指向
    `/var/lib/kavita` 的**符号链接**（deb 随包分发 + postinst 自愈），状态全落数据卷。
@@ -35,8 +40,9 @@ AGENTS.md → HANDOFF.md → docs/TASK_STATE.md → docs/DESIGN_DECISIONS.md
 6. systemd 沙箱：NoNewPrivileges/ProtectSystem=strict/ProtectHome，
    `ReadWritePaths=/var/lib/kavita` + 单文件 `/usr/local/kavita/bin/wwwroot/index.html`
    （应用启动时会写回 base href）。
-7. 构建四阶段：`fetch`（下载+sha256 锚点/lock）→ `stage`（组装+清洗+base href 重写）
-   → `verify`（规范断言+ELF 架构防呆）→ `deb`（makedeb.sh 纯标准库打包）。
+7. 构建四阶段：`fetch`（下载自建产物+SHA256SUMS 双层校验）→ `stage`（组装+清洗+
+   base href 重写）→ `verify`（规范断言+ELF 架构防呆+V6/S11/零网络红线）→
+   `deb`（makedeb.sh 纯标准库打包）。
 
 ## 4. 目录布局与禁止触碰路径
 
@@ -103,8 +109,15 @@ TARGET_ARCH=arm64 ./build.sh   # 或改 config.env 后重跑
 - systemd 单元**禁止 Restart/RestartSec**（商店审核项）、**ExecStart 禁止 `$` 变量**（坑 1）。
 - prerm 升级路径**不得 disable**（坑 3）；配置首装**只在缺失时投放**（坑 2 conffile）。
 - `init.d/` 只允许 1 个与 system_id 同名的 service（坑 11）。
-- 构建机为 macOS：产物须过 AppleDouble/Mach-O/xattr 断言（坑 8/28）。
-- deb 内任何脚本不得出现在线安装/下载（坑 15 S8 红线）。
+- 构建机为 macOS：产物须过 AppleDouble/Mach-O/xattr 断言（坑 8/28）；
+  嵌套归档（webui.bz2）必须 python tarfile root:root 重打（坑 46/S11）。
+- **审核红线**：
+  - V6：deb 内一切二进制必须公开可审计源（本包=CI 自建+BUILD-INFO+PROVENANCE，
+    禁止回退到上游预编译 tarball，verify 有断言）；
+  - C3：隐私政策三处可达（包内 + /kavita/privacy-policy.html 路由 + 提审表单）；
+  - V11：lang 全文禁 `\bbeta\b`（check_assets 门禁）；
+  - S8/零网络：包内脚本禁在线安装令牌（verify 有扫描）；
+  - 坑 49：publisher/auth=上游 Kavita Team，control Maintainer=打包者。
 
 ## 10. 已定决策要点索引
 

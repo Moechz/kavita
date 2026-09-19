@@ -66,3 +66,45 @@
 **Consequences:**
 - TOS 基座无 libjemalloc 保证；缺失时上游脚本也只是打印提示继续跑。
 - 低内存机型用户可自行在 `/usr/local/kavita/kavita.env` 加 `LD_PRELOAD`（apt 装 libjemalloc2 后）。
+
+### D-010: 二进制改为公开 CI 源码自建（审核 V6 路线，2026-09-19）
+**Decision:** 不再从上游 Release 下载预编译 tarball 打包；新增
+`build-upstream.yml`（公开仓库 Moechz/kavita）从上游源码 tag 自建
+linux-x64/arm64 tarball，构建步骤与上游 release-workflow.yml 逐字对齐
+（Node 24 `npm ci --legacy-peer-deps && npm run prod` + `monorepo-build.sh`）。
+fetch 双层校验：Release SHA256SUMS × config.env 锚点；tarball 内带 BUILD-INFO
+（source_tag/commit/dotnet_sdk/run_id）；verify 断言 `built_from=source`。
+**Rationale:**
+- metube/hermesagent/alist/sftpgo/beszel 连续被 V6 驳回：deb 内一切预编译
+  ELF/DLL 无公开可审计来源即一票否决（坑 30a/31/32/43）；.NET 应用整树
+  都是"预编译物"，比单二进制 Go 应用更撞枪口。
+- 采用 alist 级"哈希 pin + 公开 CI"可审计性（弱于 sftpgo 的位级复现路线）；
+  若仍被驳，升级到坑 32 配方（两次独立构建位级一致自证）。
+**Consequences:**
+- 构建依赖公开 GitHub Actions（免费 runner），本地 build.sh 只消费
+  build-v<tag> Release 的自建产物；上游 tag 升级时先跑 CI 再回填锚点。
+- Release notes 备审三链接：workflow 文件 / 公开 Actions run / build-v Release。
+
+### D-011: 隐私政策随包双落盘 + nginx 精确路由直出（审核 C3，2026-09-19）
+**Decision:** 双语 privacy-policy.html 落 /usr/local/kavita/ +
+`location = /kavita/privacy-policy.html` alias 直出；webui 占位页加链接（可发现性）。
+**Rationale:** C3 驳回实锤（坑 45）：凡涉及账号/用户数据/外部请求的应用
+隐私政策是必备资产；Kavita 有账号体系 + 上游匿名统计端点
+（stats.kavitareader.com，可在 Server Settings → Analytics 关闭）+ 可选 SMTP，
+政策中全部披露。遥测默认值是上游 DB 层设置，不由 appsettings 控制，
+故选择"披露 + 关闭指引"而非改默认（避免未知键冒险）。
+**Consequences:** 提审表单填公开仓库同源 URL，三处可达。
+
+### D-012: 署名分工——publisher/auth 填上游，Maintainer 填打包者（坑 49）
+**Decision:** config.ini publisher 与 lang auth = `Kavita Team`（上游）；
+control Maintainer = Moechz（打包者），Description 尾部注明
+"Upstream author / Packaged for TOS by"。
+**Consequences:** 应用中心"开发者"列显示上游团队（用户认知与版权诚实），
+dpkg 语义上包问题仍指向打包者。
+
+### D-013: webui.bz2 归档属主归一化 root:root（审核 S11，2026-09-19）
+**Decision:** 嵌套归档用 python tarfile 重打：uid/gid=0、uname/gname=root、
+mtime=0；verify 断言全部条目 uid=0（macOS bsdtar 无 --owner，曾把打包机
+uid 501 写进归档被 S11 警告）。
+**Consequences:** 跨平台无 gnu-tar 依赖；makedeb 主归档本就 root:root，
+嵌套归档口径从今对齐。

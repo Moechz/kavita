@@ -1,12 +1,13 @@
 # Task state
 
-快照日期：2026-09-17
-当前版本：0.9.1.4-2（上游 v0.9.1.4）
-最近实现提交：初始封装（git init 后首个提交）
+快照日期：2026-09-19
+当前版本：0.9.1.4-2（上游 v0.9.1.4；提审规范对齐整改中）
+最近实现提交：fb83bb5 起（V6/C3/S11/V11/坑 49 整改系列）
 
 ## 1. 仓库状态
 
-- 首包全流程已验证，git init + 首提交（见 HANDOFF）。
+- 公开仓库已建：https://github.com/Moechz/kavita（SSH 推送；github.com 443 直连间歇不可用时用 SSH）
+- CI `build-upstream.yml` 从上游源码自建二进制（run 35418309574，2026-09-19 首跑）
 
 ## 2. 完成情况（按模块）
 
@@ -15,12 +16,16 @@
 | 上游调研（config 解析/BaseUrl/首启流程/安全头） | ✅ 源码级确认（DESIGN_DECISIONS D-001~009） |
 | 构建系统（build.sh 四阶段 + makedeb.sh + Makefile check） | ✅ 跑通 |
 | 资产（config.ini/lang 23 语/图标/nginx/service/生命周期脚本） | ✅ 完成 |
-| amd64 deb（0.9.1.4-2） | ✅ 构建通过 verify |
-| arm64 deb（0.9.1.4-2） | ✅ 构建通过 verify + 解包 ELF 复核（坑 28） |
-| 真机安装/升级/卸载（tnas-57，apt 路径） | ✅ 全部通过（见 §3） |
+| 提审规范对齐（V6 源码自建/C3 隐私/S11 属主/V11 门禁/坑 49 署名） | ✅ 本地整改完成（见 CHANGELOG 0.9.1.4-2 Changed） |
+| CI 源码自建（build-upstream.yml → build-v0.9.1.4 Release） | 🔄 首跑中，待回填 sha256 锚点 |
+| 源码自建产物重建 deb（双架构）+ 真机回归 | ⬜ 待 CI 完成后 |
+| 真机安装/升级/卸载（tnas-57，apt 路径） | ✅ 上游预编译版全绿（自建版需回归重测） |
 | 应用中心手动安装路径（坑 11/⑨） | ⬜ 手工步骤（需 TOS web UI 操作） |
 
-## 3. 最近一次验证（2026-09-17，tnas-57 TOS 真机 x86_64）
+## 3. 最近一次验证（2026-09-17，tnas-57 TOS 真机 x86_64，上游预编译版）
+
+> 注：此轮验证针对旧二进制源（上游预编译 tarball）；V6 整改后需用源码自建
+> 产物重建 deb 并重跑本清单。
 
 命令与结果（amd64 包 0.9.1.4-1 → -2 全生命周期）：
 - 安装：`apt install -y /tmp/kavita.deb` → postinst 就绪轮询通过；

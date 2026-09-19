@@ -6,7 +6,7 @@ TerraMaster TOS 7 应用中心规范的 deb。
 
 ## 特性
 
-- **官方二进制**：上游 linux-x64 / linux-arm64 自包含 .NET 构建（sha256 锚点校验），零运行时依赖
+- **源码自建二进制**：公开 CI 从上游源码 tag 构建 linux-x64 / linux-arm64 自包含 .NET（V6 可审计：BUILD-INFO + PROVENANCE + SHA256SUMS 双层锚定），零运行时依赖
 - **新标签页打开**：TOS 桌面图标 → `http://<NAS>:8181/kavita/`（WebUI External Open）
 - **仅回环监听**：`127.0.0.1:8500`，不对外暴露端口，流量走 TOS nginx 标准路由
 - **原生子路径**：上游 `BaseUrl=/kavita/` + SPA base href 预写，OPDS / SignalR 全兼容
