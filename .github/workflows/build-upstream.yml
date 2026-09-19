@@ -114,7 +114,9 @@ jobs:
           test -f chk/Kavita/wwwroot/index.html
           # 上游二进制无执行位是已知怪癖，安装包 stage 阶段会补 0755
           chmod +x chk/Kavita/Kavita
-          ./chk/Kavita/Kavita --version || true
+          # .NET 服务端不认 --version，会直接起完整服务；timeout 包裹仅作
+          # 信息性输出（能否启动的真正验证在 TOS 真机上）
+          timeout 20 ./chk/Kavita/Kavita --version 2>&1 | head -5 || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
