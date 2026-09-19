@@ -4,14 +4,17 @@
 按 TOS 7 应用中心规范校验：
   1. assets/config.ini.in 是合法 JSON（渲染 @@VERSION@@ 等占位符后）
   2. assets/kavita.lang 含 23 语超集（真机 14 语 + 官方 14 语口径并集），
-     UTF-8 无 BOM，LF 行尾
+     UTF-8 无 BOM，LF 行尾；全文不得出现 beta 字样（审核 V11 双重门禁）
   3. assets/appsettings-init.json 是合法 JSON 且安全兜底三值正确
      （IpAddresses=127.0.0.1 / Port=8500 / BaseUrl=/kavita/）
   4. assets/ 下所有文本资产无 CRLF / BOM
+  5. 隐私政策存在且可解析（审核 C3 必备资产，坑 45）
+  6. 图标 SVG 完整性：XML 可解析 + viewBox + fill（坑 47 截断实锤）
 """
 import json
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,6 +55,14 @@ if missing:
 else:
     print(f"lang: 23 语超集齐全 ✓（共 {len(found)} 节）")
 
+# 坑 41（V11 双重门禁）：审核机器全文匹配 \bbeta\b，不分语言不分字段
+beta_hits = [ln for ln in text.splitlines() if re.search(r"\bbeta\b", ln, re.I)]
+if beta_hits:
+    print(f"lang: 含 beta 字样 ✗（V11 红线，共 {len(beta_hits)} 行）")
+    fail = 1
+else:
+    print("lang: 无 beta 字样 ✓")
+
 # ---------- 3. appsettings-init.json ----------
 try:
     cfg = json.loads((ROOT / "assets/appsettings-init.json").read_text(encoding="utf-8"))
@@ -87,5 +98,39 @@ for p in sorted((ROOT / "assets").rglob("*")):
         fail = 1
 if fail == 0:
     print("行尾/BOM: 全部合规 ✓")
+
+# ---------- 5. 隐私政策（坑 45/C3）----------
+pp = ROOT / "assets/privacy-policy.html"
+if not pp.is_file() or "Privacy Policy" not in pp.read_text(encoding="utf-8")[:2000] \
+        or "隐私政策" not in pp.read_text(encoding="utf-8"):
+    print("privacy-policy.html: 缺失或非双语模板 ✗")
+    fail = 1
+else:
+    print("privacy-policy.html: 双语隐私政策存在 ✓")
+
+# ---------- 6. 图标完整性（坑 47：下载截断实锤）----------
+icon = ROOT / "assets/images/icons/kavita.svg"
+try:
+    tree = ET.parse(icon)
+    root_el = tree.getroot()
+    errs = []
+    if not root_el.get("viewBox"):
+        errs.append("缺 viewBox")
+    svg_txt = icon.read_text(encoding="utf-8")
+    if "fill" not in svg_txt:
+        errs.append("无 fill 色")
+    paths = root_el.iter("{http://www.w3.org/2000/svg}path")
+    n_short = sum(1 for p_ in paths
+                  if p_.get("d") is not None and len(p_.get("d")) < 20)
+    if n_short:
+        errs.append(f"{n_short} 个 path d 数据异常短（疑似截断）")
+    if errs:
+        print(f"icon: {errs} ✗")
+        fail = 1
+    else:
+        print("icon: SVG 可解析 + viewBox/fill/path 完整 ✓")
+except ET.ParseError as e:
+    print(f"icon: XML 解析失败（疑似截断）✗ ({e})")
+    fail = 1
 
 sys.exit(fail)

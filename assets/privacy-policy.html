@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kavita Reading Server — Privacy Policy / 隐私政策</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1rem;line-height:1.6;color:#222}
+h1{font-size:1.5rem}h2{font-size:1.15rem;margin-top:1.6rem;border-bottom:1px solid #ddd;padding-bottom:.3rem}
+.zh{background:#f7f7f9;padding:.8rem 1rem;border-radius:6px;font-size:.92rem}
+code{background:#f0f0f2;padding:.1rem .3rem;border-radius:3px;font-size:.9em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:.4rem .6rem;text-align:left;font-size:.92rem}
+</style>
+</head>
+<body>
+
+<h1>Kavita Reading Server — Privacy Policy</h1>
+<p class="zh">本文档为双语隐私政策。英文版在前，中文版在后。（This document is bilingual: English first, Chinese below.）</p>
+
+<h2>1. Overview</h2>
+<p>Kavita Reading Server is a digital library that runs <strong>entirely on your own NAS device</strong> (TerraMaster TOS 7). The TOS package publisher (Moechz) does <strong>not collect, transmit, or share any personal data</strong>: no analytics operated by the publisher, no telemetry, no tracking, and no advertising SDKs. All your books, comics, accounts and reading data stay on your device.</p>
+
+<h2>2. Data stored on your device</h2>
+<table>
+<tr><th>Data</th><th>Location</th><th>Purpose</th></tr>
+<tr><td>User accounts (usernames, hashed passwords, roles, age ratings)</td><td><code>/var/lib/kavita/kavita.db</code></td><td>Multi-user access control for your library</td></tr>
+<tr><td>Library metadata, reading progress, bookmarks, reading lists</td><td><code>/var/lib/kavita/kavita.db</code></td><td>Library state and cross-device progress sync between your own users</td></tr>
+<tr><td>Covers, thumbnails, cache and application logs</td><td><code>/var/lib/kavita/</code> (covers/, cache/, logs/)</td><td>Serving your library in the browser</td></tr>
+<tr><td>App configuration and JWT signing key</td><td><code>/var/lib/kavita/appsettings.json</code></td><td>Server settings (loopback port, base URL, email); the key signs login sessions</td></tr>
+<tr><td>Your media files</td><td>The library folders you chose</td><td>Your content — the app never modifies or uploads the source files</td></tr>
+</table>
+<p>This data stays on your device. It is never uploaded by the package publisher.</p>
+
+<h2>3. Upstream anonymous usage statistics (and how to disable)</h2>
+<p>The upstream Kavita project collects <strong>anonymized, non-personal usage statistics</strong> (such as an install ID, application version and OS information) to help improve the software. This is a feature of the upstream application, sent to the upstream project's statistics endpoint (<code>stats.kavitareader.com</code>) — it is not operated by, and not accessible to, the package publisher.</p>
+<ul>
+<li><strong>Disable</strong>: open the web UI as admin → <em>Server Settings → Analytics</em> and turn analytics off at any time.</li>
+<li>The statistics contain no filenames, no library content, no account data and no personally identifiable information.</li>
+</ul>
+
+<h2>4. Other network access (user-initiated only)</h2>
+<ul>
+<li><strong>Email (optional)</strong>: if you configure an SMTP server in <em>Server Settings → Email</em>, Kavita sends library invitation/password-reset emails through that server. The destination and region are those of your chosen mail provider.</li>
+<li><strong>OPDS / web reader</strong>: served only on your LAN through the TOS web route <code>/kavita/</code>; the backend listens on loopback only and exposes no external port.</li>
+<li><strong>Nothing else</strong>: the app makes no other outbound connections by default, and sends no data to Moechz or any Moechz-operated server.</li>
+</ul>
+
+<h2>5. Accounts and children</h2>
+<p>Accounts are created by you (the first visitor runs the setup wizard and becomes admin; further users are invited by the admin). Passwords are stored hashed. Age-rating and restricted profiles let parents control content for children; the service itself is a LAN application.</p>
+
+<h2>6. Your rights: access, correction, deletion</h2>
+<ul>
+<li><strong>Access</strong>: use the web UI (user settings, reading history), or read the files listed above directly on the NAS.</li>
+<li><strong>Correction</strong>: edit users, libraries and settings in the web UI at any time.</li>
+<li><strong>Deletion</strong>: remove users/content in the UI; <code>apt remove kavita</code> (or TOS App Center uninstall) keeps <code>/var/lib/kavita</code>, <code>apt purge</code> deletes it. Your media source files are never touched.</li>
+</ul>
+
+<h2>7. Changes and contact</h2>
+<p>This policy ships inside the application package and is served at <code>/kavita/privacy-policy.html</code> on your device. Upstream project: <code>https://github.com/Kareadita/Kavita</code>. TOS packaging issues: <code>https://github.com/Moechz/kavita</code> (Issues).</p>
+
+<hr>
+
+<h1>Kavita Reading Server — 隐私政策（中文）</h1>
+
+<h2>1. 概述</h2>
+<p>Kavita Reading Server 是完全运行在<strong>您自己的 NAS 设备</strong>（TerraMaster TOS 7）上的数字图书馆。TOS 打包发布者（Moechz）<strong>不收集、不传输、不共享任何个人数据</strong>：无发布者运营的统计、无遥测、无跟踪、无广告 SDK。您的书籍、漫画、账号与阅读数据全部保留在设备上。</p>
+
+<h2>2. 存储在您设备上的数据</h2>
+<table>
+<tr><th>数据</th><th>位置</th><th>用途</th></tr>
+<tr><td>用户账号（用户名、哈希后的密码、角色、适龄分级）</td><td><code>/var/lib/kavita/kavita.db</code></td><td>图书馆的多用户访问控制</td></tr>
+<tr><td>库元数据、阅读进度、书签、阅读清单</td><td><code>/var/lib/kavita/kavita.db</code></td><td>库状态与您自己用户间的进度同步</td></tr>
+<tr><td>封面、缩略图、缓存与应用日志</td><td><code>/var/lib/kavita/</code>（covers/、cache/、logs/）</td><td>在浏览器中呈现您的图书馆</td></tr>
+<tr><td>应用配置与 JWT 签名密钥</td><td><code>/var/lib/kavita/appsettings.json</code></td><td>服务器设置（回环端口、子路径、邮件）；密钥用于登录会话签名</td></tr>
+<tr><td>您的媒体文件</td><td>您指定的库目录</td><td>您的内容——应用从不修改或上传源文件</td></tr>
+</table>
+<p>以上数据全部保留在设备上，发布者不会上传任何内容。</p>
+
+<h2>3. 上游匿名使用统计（及关闭方法）</h2>
+<p>上游 Kavita 项目会收集<strong>匿名的、非个人的使用统计</strong>（如安装 ID、应用版本、操作系统信息）用于改进软件。这是上游应用自身的功能，数据发送到上游项目的统计端点（<code>stats.kavitareader.com</code>）——不由发布者运营，发布者也无法访问。</p>
+<ul>
+<li><strong>关闭方法</strong>：以管理员打开网页界面 → <em>服务器设置（Server Settings）→ 分析（Analytics）</em>，随时关闭统计。</li>
+<li>统计内容不包含文件名、库内容、账号数据或任何个人可识别信息。</li>
+</ul>
+
+<h2>4. 其他网络访问（仅由您主动配置触发）</h2>
+<ul>
+<li><strong>邮件（可选）</strong>：若您在 <em>服务器设置 → 邮件</em> 中配置了 SMTP 服务器，Kavita 会通过该服务器发送图书馆邀请/密码重置邮件。数据去向为您所选邮件服务商的基础设施。</li>
+<li><strong>OPDS / 网页阅读器</strong>：仅通过 TOS 标准路由 <code>/kavita/</code> 在局域网内提供服务；后端仅监听本机回环，不对外暴露任何端口。</li>
+<li><strong>除此之外</strong>：应用默认无其他对外连接，也不向 Moechz 或任何 Moechz 运营的服务器发送数据。</li>
+</ul>
+
+<h2>5. 账号与未成年人</h2>
+<p>账号由您创建（首位访问者通过向导成为管理员，其他用户由管理员邀请）。密码以哈希形式存储。适龄分级与受限账户可帮助家长控制未成年人可见内容；本服务是局域网应用。</p>
+
+<h2>6. 您的权利：访问、更正、删除</h2>
+<ul>
+<li><strong>访问</strong>：使用网页界面（用户设置、阅读历史），或直接在 NAS 上读取上述文件。</li>
+<li><strong>更正</strong>：随时在网页界面修改用户、库与设置。</li>
+<li><strong>删除</strong>：在界面中删除用户/内容；<code>apt remove kavita</code>（或 TOS 应用中心卸载）保留 <code>/var/lib/kavita</code>，<code>apt purge</code> 会删除；库目录中的媒体源文件不受影响。</li>
+</ul>
+
+<h2>7. 变更与联系</h2>
+<p>本政策随应用包分发，并在您设备上通过 <code>/kavita/privacy-policy.html</code> 提供。上游项目：<code>https://github.com/Kareadita/Kavita</code>；TOS 打包问题：<code>https://github.com/Moechz/kavita</code>（Issues）。</p>
+
+</body>
+</html>

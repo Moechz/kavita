@@ -19,3 +19,8 @@ Description: Kavita Reading Server - comics, manga, ebooks and magazines
  exposed. On first visit you create the admin account, then add your
  library folders. Data (database, covers, cache, logs) lives in
  /var/lib/kavita.
+ .
+ Binaries are built from the upstream source tag by public CI; see
+ /usr/share/doc/kavita/PROVENANCE.md for the audit chain.
+ Upstream author: the Kavita Team (https://github.com/Kareadita/Kavita)
+ Packaged for TOS by Moechz (https://github.com/Moechz/kavita)

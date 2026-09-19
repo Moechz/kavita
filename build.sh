@@ -68,7 +68,11 @@ case "$TARGET_ARCH" in
 esac
 
 TAG="v$KAVITA_VERSION"
-RELEASE_BASE="https://github.com/Kareadita/Kavita/releases/download/$TAG"
+# 审核 V6（一票否决）：二进制改为公开 CI 从上游源码 tag 自建
+# （Moechz/kavita build-upstream.yml，步骤与上游 release-workflow.yml 逐字
+# 对齐），不再从上游 Release 下载预编译 tarball；tarball 自带 BUILD-INFO
+# 溯源文件，verify 阶段断言 built_from=source。
+RELEASE_BASE="https://github.com/$SELF_BUILD_REPO/releases/download/build-$TAG"
 TGZ="kavita-linux-${K_ARCH}.tar.gz"
 # Kavita 上游不发布 checksums 文件 → 用 config.env 锚点 + 本地 lock 双保险
 LOCK_FILE="$DL_DIR/sha256.lock"
@@ -152,8 +156,19 @@ PYEOF
 stage_fetch() {
   mkdir -p "$DL_DIR"
 
-  # 1. Kavita 运行时（官方 Release，.NET self-contained，含 wwwroot/I18N 等）
+  # 1. Kavita 运行时（公开 CI 自上游源码构建；.NET self-contained，含 wwwroot/I18N）
   fetch "$RELEASE_BASE/$TGZ" "$DL_DIR/$TGZ"
+
+  # 1b. SHA256SUMS 双层互验（坑 48 陷阱 3）：Release 清单 × config.env 锚点
+  #     两层独立来源互验，防资产被替换/下载损坏；若本地缓存是旧版预编译
+  #     tarball 会在此报错，删 build/downloads/kavita-linux-*.tar.gz 后重跑
+  fetch "$RELEASE_BASE/SHA256SUMS" "$DL_DIR/SHA256SUMS-$KAVITA_VERSION"
+  local sums_line
+  sums_line=$(grep -a " $TGZ\$" "$DL_DIR/SHA256SUMS-$KAVITA_VERSION" | head -1 | awk '{print $1}')
+  [ -n "$sums_line" ] || die "SHA256SUMS 中找不到 $TGZ（Release 资产不完整？）"
+  [ "$(sha256_of "$DL_DIR/$TGZ")" = "$sums_line" ] \
+    || die "$TGZ 与 Release SHA256SUMS 不符（若为旧缓存请删 build/downloads/kavita-linux-*.tar.gz 后重跑）"
+  log "  ok: $TGZ（Release SHA256SUMS 双层互验通过）"
 
   # 2. 上游 LICENSE 兜底预取（仅当 tarball 不随包 LICENSE 时才会用到；
   #    成员名在 stage 阶段重新探测，保证单跑 stage 世能工作）
@@ -269,9 +284,24 @@ PYEOF
       "$ASSETS_DIR/webui/index.html" > "$WEBUI_DIR/index.html"
   # 坑 8（macOS 污染）：bsdtar 会把扩展属性存成 AppleDouble ._ 条目打进归档。
   # 双保险：COPYFILE_DISABLE=1 禁用 + 打包前删除 ._ 文件
-  export COPYFILE_DISABLE=1
   find "$WEBUI_DIR" -name '._*' -delete 2>/dev/null || true
-  ( cd "$WEBUI_DIR" && COPYFILE_DISABLE=1 tar -cjf "$APP/webui.bz2" index.html )
+  # 坑 46（S11 警告实锤）：嵌套归档条目属主必须是 root:root，macOS bsdtar
+  # 无 --owner 参数，改用 python tarfile 重打（uid/gid=0、uname/gname=root、mtime=0）
+  python3 - "$WEBUI_DIR" "$APP/webui.bz2" <<'PYEOF'
+import os, sys, tarfile
+src, dest = sys.argv[1], sys.argv[2]
+with tarfile.open(dest, "w:bz2") as tf:
+    for name in sorted(os.listdir(src)):
+        p = os.path.join(src, name)
+        if not os.path.isfile(p):
+            continue
+        ti = tf.gettarinfo(p, arcname=name)
+        ti.uid = ti.gid = 0
+        ti.uname = ti.gname = "root"
+        ti.mtime = 0
+        with open(p, "rb") as f:
+            tf.addfile(ti, f)
+PYEOF
 
   # Kavita 配置模板（postinst 首装投放 appsettings-init.json 的源；
   # Kavita 首启重命名为 appsettings.json 并自动生成 JWT TokenKey）
@@ -282,6 +312,14 @@ PYEOF
   # 配置模板（以 .example 随包分发，postinst 首装复制为正式 env；升级不覆盖）
   log "  + $APP_ID.env.example 配置模板"
   cp "$ASSETS_DIR/$APP_ID.env" "$APP/$APP_ID.env.example"
+
+  # 隐私政策（审核 C3 必备资产）：双落盘包内 + nginx 精确路由直出（坑 45）
+  log "  + privacy-policy.html（双语，nginx 精确路由 /$APP_ID/privacy-policy.html）"
+  cp "$ASSETS_DIR/privacy-policy.html" "$APP/privacy-policy.html"
+
+  # 二进制溯源链说明（审核 V6 审计者材料，坑 31/32/43）
+  log "  + PROVENANCE.md（源码构建审计链）"
+  cp "$ASSETS_DIR/PROVENANCE.md" "$STAGE_DIR/usr/share/doc/$APP_ID/PROVENANCE.md"
 
   # 文档（tar 列表精确匹配 LICENSE 成员名，不猜路径形态；缺失时用 fetch 预取的副本）
   local license_member
@@ -295,7 +333,7 @@ PYEOF
     echo "$APP_ID ($VERSION_FULL) TOS7; urgency=medium"
     echo ""
     echo "  * 基于 Kavita 上游 $KAVITA_VERSION 打包"
-    echo "  * 运行时取自官方 Release（sha256 锚点校验），.NET self-contained 零运行时依赖"
+    echo "  * 运行时由公开 CI 从上游源码构建（sha256 双层锚定），.NET self-contained 零运行时依赖"
     echo "  * WebUI External Open：新标签页经 /$APP_ID/ 路由访问，后端仅监听回环"
     echo "  * 子路径经 BaseUrl=/$APP_ID/ 原生支持（SPA base href 构建期预写）"
     echo "  * 状态目录经 bin/config 符号链接落在 /var/lib/$APP_ID"
@@ -312,6 +350,8 @@ PYEOF
     "$APP/init.d/"*.service \
     "$STAGE_DIR/etc/systemd/system/"*.service \
     "$APP/config-template/appsettings-init.json" \
+    "$APP/privacy-policy.html" \
+    "$STAGE_DIR/usr/share/doc/$APP_ID/PROVENANCE.md" \
     "$APP/"*.example \
     "$STAGE_DIR/usr/share/doc/$APP_ID/changelog.Debian" \
     "$STAGE_DIR/usr/share/doc/$APP_ID/copyright"
@@ -346,6 +386,9 @@ stage_verify() {
            "$APP/webui.bz2" \
            "$APP/$APP_ID.env.example" \
            "$APP/config-template/appsettings-init.json" \
+           "$APP/privacy-policy.html" \
+           "$APP/bin/BUILD-INFO" \
+           "$STAGE_DIR/usr/share/doc/$APP_ID/PROVENANCE.md" \
            "$STAGE_DIR/usr/share/doc/$APP_ID/copyright"; do
     [ -e "$p" ] || { warn "缺失: ${p#$STAGE_DIR/}"; fail=1; }
   done
@@ -447,6 +490,47 @@ PYEOF
     warn "webui.bz2 含 AppleDouble ._ 垃圾条目（macOS 污染）"
     fail=1
   fi
+
+  log "校验 webui.bz2 属主（坑 46/S11：全部条目必须 root:root）..."
+  python3 - "$APP/webui.bz2" <<'PYEOF' || fail=1
+import sys, tarfile
+bad = []
+with tarfile.open(sys.argv[1]) as tf:
+    for m in tf.getmembers():
+        if m.uid != 0 or m.gid != 0:
+            bad.append(m.name)
+if bad:
+    print(f"    非法属主条目: {bad}", file=sys.stderr)
+    sys.exit(1)
+PYEOF
+
+  log "校验 BUILD-INFO（审核 V6：二进制必须源码自建，禁预编译上游产物）..."
+  local bi="$APP/bin/BUILD-INFO"
+  if [ -f "$bi" ]; then
+    grep -q '^built_from=source$' "$bi" \
+      || { warn "BUILD-INFO 缺 built_from=source"; fail=1; }
+    grep -q "^source_tag=v$KAVITA_VERSION\$" "$bi" \
+      || { warn "BUILD-INFO source_tag 与 KAVITA_VERSION 不符"; fail=1; }
+    grep -q '^built_by=github-actions$' "$bi" \
+      || { warn "BUILD-INFO 缺 built_by=github-actions"; fail=1; }
+    log "  ok: $(grep '^source_tag=' "$bi")"
+  else
+    warn "缺 bin/BUILD-INFO：tarball 非源码自建产物（审核 V6 一票否决项）"
+    fail=1
+  fi
+
+  log "校验隐私政策可达（坑 45/C3：包内双落盘 + nginx 精确路由）..."
+  grep -q 'Privacy Policy' "$APP/privacy-policy.html" \
+    || { warn "privacy-policy.html 内容异常"; fail=1; }
+  grep -q "location = /$APP_ID/privacy-policy.html" "$APP/nginx/$APP_ID.conf" \
+    || { warn "nginx 缺隐私政策精确路由（坑 45/C3）"; fail=1; }
+
+  log "零网络扫描（坑 15/S8：包内脚本不得出现在线安装令牌）..."
+  local n_net
+  n_net=$(grep -rniE 'pip(3)? install|pip download|--index-url|pypi\.(org|tuna)|urllib\.request|urlopen|npm install -g|curl .*(debian|ubuntu)\.org' \
+      "$ASSETS_DIR" --include='*.sh' --include='*.py' --include='preinst' \
+      --include='postinst' --include='prerm' --include='postrm' 2>/dev/null | wc -l | tr -d ' ')
+  [ "$n_net" = "0" ] || { warn "发现 $n_net 行疑似在线安装令牌（S8 红线）"; fail=1; }
 
   log "校验 ELF 架构（目标: $ELF_ARCH, for GNU/Linux）..."
   local f
