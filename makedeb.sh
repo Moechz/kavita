@@ -1,13 +1,13 @@
 #!/bin/sh
 # ============================================================
-# makedeb.sh - 不依赖 dpkg 的极简 deb 打包器（macOS/Linux 通用）
+# makedeb.sh - minimal deb packer with no dpkg dependency (works on macOS and Linux)
 #
-# 原理: deb = ar 归档，依次包含三个成员:
+# How it works: a deb is an ar archive holding three members, in order:
 #   1. debian-binary   "2.0\n"
 #   2. control.tar.gz  (control/conffiles/postinst/prerm/postrm/md5sums)
-#   3. data.tar.xz     (文件系统树, root:root)
+#   3. data.tar.xz     (filesystem tree, root:root)
 #
-# 用法: makedeb.sh <pkgroot> <assets_dir> <out.deb> <version> <arch> <maintainer>
+# Usage: makedeb.sh <pkgroot> <assets_dir> <out.deb> <version> <arch> <maintainer>
 # ============================================================
 set -eu
 
@@ -18,13 +18,13 @@ VERSION=$4
 ARCH=$5
 MAINTAINER=$6
 
-[ -d "$PKGROOT" ] || { echo "错误: pkgroot 不存在: $PKGROOT" >&2; exit 1; }
+[ -d "$PKGROOT" ] || { echo "error: pkgroot does not exist: $PKGROOT" >&2; exit 1; }
 
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/makedeb.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT
 
-# ---------- 工具兼容层 ----------
-md5_of() { # md5_of <file> -> 输出 32 位哈希
+# ---------- tool compatibility layer ----------
+md5_of() { # md5_of <file> -> prints the 32-char hash
   if command -v md5sum >/dev/null 2>&1; then
     md5sum "$1" | cut -d' ' -f1
   else
@@ -32,13 +32,13 @@ md5_of() { # md5_of <file> -> 输出 32 位哈希
   fi
 }
 
-# ---------- 1. 生成 DEBIAN/control ----------
+# ---------- 1. generate DEBIAN/control ----------
 INSTALLED_SIZE_KB=$(du -sk "$PKGROOT" | cut -f1)
 
-# 模板变量替换
+# template variable substitution
 CONTROL_SRC="$ASSETS/control.in"
 if [ ! -f "$CONTROL_SRC" ]; then
-  echo "错误: 缺少 $CONTROL_SRC" >&2
+  echo "error: missing $CONTROL_SRC" >&2
   exit 1
 fi
 sed -e "s|@VERSION@|$VERSION|g" \
@@ -52,16 +52,16 @@ rm -rf "$DEBIAN_DIR"
 mkdir -p "$DEBIAN_DIR"
 cp "$WORK/control" "$DEBIAN_DIR/control"
 
-# 维护脚本（@VERSION@ 注入；preinst/postinst/prerm/postrm）
+# maintainer scripts (@VERSION@ injected; preinst/postinst/prerm/postrm)
 for f in preinst postinst prerm postrm; do
   sed -e "s|@VERSION@|$VERSION|g" "$ASSETS/$f" > "$DEBIAN_DIR/$f"
   chmod 0755 "$DEBIAN_DIR/$f"
 done
 
 # ---------- 2. md5sums ----------
-# 排除 macOS 污染物（坑 8）：.DS_Store 与 AppleDouble ._ 边车不得进包/清单
-# （kavita 树 350MB，压缩耗时分钟级，stage 清理后 macOS 可能再生成，
-#  必须在打包器层面兑底）
+# Exclude macOS pollution (pitfall 8): .DS_Store and AppleDouble ._ sidecars must not enter the package or the manifest
+# (the kavita tree is ~350 MB and takes minutes to compress; macOS may recreate them after the stage cleanup,
+#  so the packer has to exclude them as a last line of defence)
 ( cd "$PKGROOT"
   find . -type f ! -path './DEBIAN/*' \
          ! -name '.DS_Store' ! -name '._*' | LC_ALL=C sort | while IFS= read -r f; do
@@ -70,13 +70,13 @@ done
   done
 ) > "$DEBIAN_DIR/md5sums"
 
-# ---------- 3. 打 data.tar.xz 与 control.tar.gz ----------
-# 注意: 必须用 Python tarfile(GNU_FORMAT) 而非 bsdtar——
-#   macOS bsdtar 即使 --format gnutar，遇长路径/特殊元数据仍会插入 PAX
-#   扩展头(type 'x')，而 dpkg 只认纯 ustar/gnu 头，安装时报
+# ---------- 3. build data.tar.xz and control.tar.gz ----------
+# Note: Python tarfile(GNU_FORMAT) is mandatory here, not bsdtar --
+#   even with --format gnutar, macOS bsdtar inserts PAX extended headers
+#   (type 'x') for long paths or unusual metadata, and dpkg only accepts plain ustar/gnu headers:
 #   "corrupted filesystem tarfile ... unsupported PAX tar header type 'x'"
-#   Python GNU_FORMAT 保证纯 GNU 头，且 uid/gid/uname/gname/mtime 完全可控
-#   （root:root + mtime 归一，顺带满足可复现构建）。
+#   Python GNU_FORMAT guarantees plain GNU headers with fully controlled uid/gid/uname/gname/mtime
+#   (root:root plus normalised mtime, which also helps reproducible builds).
 python3 - "$PKGROOT" "$WORK" <<'PYEOF'
 import os, sys, tarfile
 
@@ -89,7 +89,7 @@ def build(out_path, src_dir, exclude_debian=False):
         for root, dirs, files in os.walk(src_dir):
             dirs.sort()
             for name in sorted(dirs) + sorted(files):
-                # 排除 macOS 污染物（坑 8）：.DS_Store / AppleDouble ._ 边车
+                # Exclude macOS pollution (pitfall 8): .DS_Store / AppleDouble ._ sidecars
                 if name == '.DS_Store' or name.startswith('._'):
                     continue
                 entries.append(os.path.join(root, name))
@@ -109,24 +109,24 @@ def build(out_path, src_dir, exclude_debian=False):
 
 build(os.path.join(work, 'data.tar.xz'), pkgroot, exclude_debian=True)
 build(os.path.join(work, 'control.tar.gz'), os.path.join(pkgroot, 'DEBIAN'))
-print('tar 归档完成(GNU_FORMAT, root:root, mtime=0)')
+print('tar archives written (GNU_FORMAT, root:root, mtime=0)')
 PYEOF
 
-# ---------- 4. 组装 ar 归档 ----------
+# ---------- 4. assemble the ar archive ----------
 printf '2.0\n' > "$WORK/debian-binary"
-# 成员顺序必须为 debian-binary, control.tar.*, data.tar.*
-# -S: 不写 ar 符号表（dpkg 要求）
+# Member order must be debian-binary, control.tar.*, data.tar.*
+# -S: do not write the ar symbol table (dpkg requirement)
 rm -f "$OUTDEB"
 ar rcS "$OUTDEB" "$WORK/debian-binary" "$WORK/control.tar.gz" "$WORK/data.tar.xz"
 
-# ---------- 5. 校验 ----------
+# ---------- 5. verification ----------
 if command -v dpkg-deb >/dev/null 2>&1; then
-  echo "--- dpkg-deb 校验 ---"
+  echo "--- dpkg-deb verification ---"
   dpkg-deb --info "$OUTDEB" | head -20
   dpkg-deb --contents "$OUTDEB" | head -5
   echo "..."
 else
-  echo "(本机无 dpkg-deb，跳过校验；deb 可在目标机上用 dpkg -c 查看)"
+  echo "(no dpkg-deb on this host; skipped. Inspect the deb on the target with dpkg -c)"
 fi
 
-echo "打包完成: $OUTDEB ($(du -h "$OUTDEB" | cut -f1), Installed-Size: ${INSTALLED_SIZE_KB}KB)"
+echo "packaged: $OUTDEB ($(du -h "$OUTDEB" | cut -f1), Installed-Size: ${INSTALLED_SIZE_KB}KB)"

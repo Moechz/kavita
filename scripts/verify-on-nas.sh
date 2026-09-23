@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# 真机验证脚本（App Center 手动安装后跑一遍；也可用于 apt 路径/升级回归）
+# On-device verification script (run once after an App Center manual install;
+# also usable for apt installs, upgrades and uninstall regressions).
 #
-# 用法：
-#   bash scripts/verify-on-nas.sh              # 默认 ssh tnas-57
-#   bash scripts/verify-on-nas.sh <ssh别名>
-#   bash scripts/verify-on-nas.sh root@192.168.124.57
+# Usage:
+#   bash scripts/verify-on-nas.sh                 # defaults to: ssh tnas-57
+#   bash scripts/verify-on-nas.sh <ssh-alias>
+#   bash scripts/verify-on-nas.sh root@192.168.1.10
 #
-# TOS 管理账户即 uid 0，不加 sudo。对应 docs/TASK_STATE.md §8 验证清单。
+# The TOS admin account is uid 0, so do not prefix with sudo.
 set -u
 
 HOST="${1:-tnas-57}"
@@ -16,45 +17,46 @@ WEB=8181
 
 run() { ssh -o ConnectTimeout=10 "$HOST" "$@"; }
 
-echo "===== 0. 连通性 ====="
-run 'echo "主机: $(hostname) / $(dpkg --print-architecture)"' || { echo "SSH 不通，检查网络/别名"; exit 1; }
+echo "===== 0. Connectivity ====="
+run 'echo "host: $(hostname) / $(dpkg --print-architecture)"' \
+  || { echo "SSH unreachable - check the network and the alias"; exit 1; }
 
 echo
-echo "===== 1. dpkg 与服务状态 ====="
-run "dpkg-query -W -f='dpkg: \${Status} \${Version}\n' $APP 2>/dev/null || echo 'dpkg: 未安装'
+echo "===== 1. dpkg and service state ====="
+run "dpkg-query -W -f='dpkg: \${Status} \${Version}\n' $APP 2>/dev/null || echo 'dpkg: not installed'
 echo \"active: \$(systemctl is-active $APP 2>/dev/null) / enabled: \$(systemctl is-enabled $APP 2>/dev/null)\""
 
 echo
-echo "===== 2. App Center 注册产物（坑 11：卡死判据）====="
-run "echo -n 'sc.d 注册: '; [ -s /etc/sc.d/$APP ] && echo \"非空 \$(stat -c%s /etc/sc.d/$APP)B ✓\" || echo '空/缺失 ✗（注册未走完）'
-echo -n '桌面 oexe: '; n=\$(ls /var/subvols/*/@/@desktop/*[Kk]avita*.oexe 2>/dev/null | wc -l); echo \"\$n 个 $([ \"\$n\" -ge 14 ] && echo ✓ || echo '✗ 预期 14')（多用户机器上按用户多份属正常）\""
+echo "===== 2. App Center registration artifacts (pitfall 11: stuck-install criteria) ====="
+run "echo -n 'sc.d registration: '; [ -s /etc/sc.d/$APP ] && echo \"non-empty \$(stat -c%s /etc/sc.d/$APP)B OK\" || echo 'empty/missing FAIL (registration did not complete)'
+echo -n 'desktop oexe: '; n=\$(ls /var/subvols/*/@/@desktop/*[Kk]avita*.oexe 2>/dev/null | wc -l); echo \"\$n $([ \"\$n\" -ge 14 ] && echo OK || echo 'FAIL expected 14') (one set per user is normal on multi-user devices)\""
 
 echo
-echo "===== 3. 回环 + 平台路由 ====="
-run "ss -tlnp 2>/dev/null | grep -q '127.0.0.1:$PORT' && echo '回环 $PORT: ✓ 监听中' || echo '回环 $PORT: ✗ 未监听'
-ss -tlnp 2>/dev/null | grep -qE '(0\.0\.0\.0|\*):$PORT' && echo '⚠️ 端口外泄（非回环监听）' || echo '回环封闭: ✓ 无对外监听'
-curl -s -o /dev/null -w '健康接口 /$APP/api/health: %{http_code}\n' http://127.0.0.1:$WEB/$APP/api/health
-curl -s -o /dev/null -w '平台路由 /$APP/: %{http_code}\n' http://127.0.0.1:$WEB/$APP/
-curl -s -o /dev/null -w '隐私政策(审核 C3): %{http_code}\n' http://127.0.0.1:$WEB/$APP/privacy-policy.html
+echo "===== 3. Loopback + platform route ====="
+run "ss -tlnp 2>/dev/null | grep -q '127.0.0.1:$PORT' && echo 'loopback $PORT: OK listening' || echo 'loopback $PORT: FAIL not listening'
+ss -tlnp 2>/dev/null | grep -qE '(0\.0\.0\.0|\*):$PORT' && echo 'WARNING: port exposed (non-loopback listener)' || echo 'loopback closed: OK (no external listener)'
+curl -s -o /dev/null -w 'health endpoint /$APP/api/health: %{http_code}\n' http://127.0.0.1:$WEB/$APP/api/health
+curl -s -o /dev/null -w 'platform route /$APP/: %{http_code}\n' http://127.0.0.1:$WEB/$APP/
+curl -s -o /dev/null -w 'privacy policy (review C3): %{http_code}\n' http://127.0.0.1:$WEB/$APP/privacy-policy.html
 curl -s http://127.0.0.1:$WEB/$APP/api/health | head -c 40; echo"
 
 echo
-echo "===== 4. 合规资产（审核 V6/C3）====="
+echo "===== 4. Compliance artifacts (review V6/C3) ====="
 run "for f in /usr/local/$APP/bin/BUILD-INFO /usr/local/$APP/PROVENANCE.md /usr/local/$APP/privacy-policy.html /usr/local/$APP/bin/Kavita; do
-  if [ -e \"\$f\" ]; then echo \"✓ \$f\"; else echo \"✗ 缺失 \$f\"; fi
+  if [ -e \"\$f\" ]; then echo \"OK   \$f\"; else echo \"FAIL missing \$f\"; fi
 done
 echo '--- BUILD-INFO ---'; cat /usr/local/$APP/bin/BUILD-INFO 2>/dev/null
-echo -n 'bin/Kavita 架构: '; file /usr/local/$APP/bin/Kavita 2>/dev/null | cut -d: -f2 | cut -c1-60"
+echo -n 'bin/Kavita architecture: '; file /usr/local/$APP/bin/Kavita 2>/dev/null | cut -d: -f2 | cut -c1-60"
 
 echo
-echo "===== 5. 数据目录与权限 ====="
-run "ls -ld /var/lib/$APP 2>/dev/null || echo '/var/lib/$APP 不存在（首启后创建）'
-[ -f /var/lib/$APP/appsettings.json ] && echo -n 'appsettings.json: ' && md5sum /var/lib/$APP/appsettings.json | cut -c1-12 || echo 'appsettings.json 尚未生成（首启向导后出现）'
+echo "===== 5. Data directory and permissions ====="
+run "ls -ld /var/lib/$APP 2>/dev/null || echo '/var/lib/$APP does not exist yet (created on first start)'
+[ -f /var/lib/$APP/appsettings.json ] && echo -n 'appsettings.json: ' && md5sum /var/lib/$APP/appsettings.json | cut -c1-12 || echo 'appsettings.json not generated yet (appears after the first-run wizard)'
 grep -o '<base href=\"[^\"]*\">' /usr/local/$APP/bin/wwwroot/index.html 2>/dev/null | head -1"
 
 echo
-echo "===== 6. 日志（最近 20 行，排障用）====="
+echo "===== 6. Logs (last 20 lines, for troubleshooting) ====="
 run "journalctl -u $APP -n 20 --no-pager 2>/dev/null | tail -20" || true
 
 echo
-echo "===== 完成：把上面输出贴回给 AI 即可判定 ====="
+echo "===== Done: paste the output above back to the assistant for a verdict ====="

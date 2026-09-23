@@ -1,19 +1,19 @@
 #!/bin/bash
-# preinst - 安装/升级前处理（TOS 规范：专用用户必须在 preinst 创建）
+# preinst - pre-install / pre-upgrade handling (TOS requirement: the dedicated user must be created here)
 set -e
 
 MAINT_LOG=/var/log/kavita-maint.log
 mkdir -p /var/log 2>/dev/null || true
 echo "$(date '+%F %T') preinst $*" >> "$MAINT_LOG" 2>/dev/null || true
 
-# 创建专用系统用户（平台安装路径下亦会自动创建；此处保证手动 apt 安装也可用；
-# --user-group 显式建同名主组，不依赖 USERGROUPS_ENAB 默认值）
+# Create the dedicated system user (the platform install path creates it as well; this covers manual apt install;
+# --user-group explicitly creates a same-named primary group instead of relying on USERGROUPS_ENAB defaults)
 if ! id -u kavita > /dev/null 2>&1; then
   useradd --system --user-group --no-create-home --shell /usr/sbin/nologin kavita 2>/dev/null || true
 fi
 
-# 数据目录（/usr/local/kavita/bin/config 符号链接的落点：
-# 数据库、封面、缓存、日志、书签、主题等全部状态）
+# Data directory (target of the /usr/local/kavita/bin/config symlink:
+# database, covers, cache, logs, bookmarks, themes - all application state)
 mkdir -p /var/lib/kavita
 chown -R kavita:kavita /var/lib/kavita 2>/dev/null || true
 

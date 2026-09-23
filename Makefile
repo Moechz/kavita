@@ -1,4 +1,4 @@
-# Makefile - 便捷入口（实际逻辑都在 build.sh）
+# Makefile - convenience entry points (the real logic lives in build.sh)
 .PHONY: all fetch stage verify deb clean distclean info check
 
 all: package
@@ -27,7 +27,7 @@ distclean:
 info:
 	./build.sh info
 
-# 语法检查
+# syntax check
 check:
 	sh -n makedeb.sh
 	bash -n build.sh
@@ -38,4 +38,4 @@ check:
 	python3 -c "import json; json.load(open('assets/config.ini.in'))"
 	python3 -c "import json; json.load(open('assets/appsettings-init.json'))"
 	python3 scripts/check_assets.py
-	@echo "语法检查通过"
+	@echo "syntax check passed"

@@ -40,16 +40,16 @@ jobs:
       - name: Record source commit
         run: echo "SRC_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      # ---- 以下步骤与上游 release-workflow.yml 逐字对齐（坑 32 规则 3）----
+      # ---- The steps below mirror the upstream release-workflow.yml exactly (guide pitfall 32, rule 3) ----
       - name: NodeJS to Compile WebUI
         uses: actions/setup-node@v5
         with:
           node-version: 24
       - run: |
-          # 与上游 docker-build.sh/build.sh 的 BuildUI 逐字对齐：
-          # Angular 应用构建器输出在 dist/browser/，须扁平化拷入 wwwroot
-          # （release-workflow.yml 里的 rsync -a dist/ 是过时写法，会把
-          # browser/ 子目录整套拷进去，与官方发布 tarball 结构不符）
+          # Mirrors the upstream docker-build.sh / build.sh BuildUI step verbatim:
+          # the Angular application builder emits dist/browser/, which must be flattened into wwwroot
+          # (the rsync -a dist/ line in release-workflow.yml is outdated: it copies the whole
+          # browser/ subdirectory, which does not match the official release tarball layout)
           rm -rf ../../Kavita.Server/wwwroot/* || true
           cd UI/Web || exit
           echo 'Installing web dependencies'
@@ -69,8 +69,8 @@ jobs:
         run: dotnet tool install -g Swashbuckle.AspNetCore.Cli
       - run: ./monorepo-build.sh
 
-      # ---- 上游脚本产出 _output/kavita-{linux-x64,linux-arm,linux-arm64}.tar.gz；
-      #      仅分发 x64/arm64 两个 TOS 需要的架构 ----
+      # ---- The upstream script produces _output/kavita-{linux-x64,linux-arm,linux-arm64}.tar.gz;
+      #      only the two architectures TOS needs (x64/arm64) are published ----
       - name: Inject BUILD-INFO + re-pack (x64/arm64 only)
         run: |
           set -e
@@ -104,7 +104,7 @@ jobs:
           out1=$(file -b chk/Kavita/Kavita)
           echo "Kavita: $out1"
           echo "$out1" | grep -q 'ELF 64-bit.*x86-64'
-          # createdump 为辅助诊断工具，信息性输出不阻断（主二进制才是硬断言）
+          # createdump is an auxiliary diagnostic tool: informational output only (the main binary is the hard assertion)
           if [ -e chk/Kavita/createdump ]; then
             echo "createdump: $(file -b chk/Kavita/createdump)"
           else
@@ -112,10 +112,10 @@ jobs:
           fi
           test -f chk/Kavita/BUILD-INFO
           test -f chk/Kavita/wwwroot/index.html
-          # 上游二进制无执行位是已知怪癖，安装包 stage 阶段会补 0755
+          # The upstream binary has no executable bit (known upstream quirk); the packaging stage adds 0755
           chmod +x chk/Kavita/Kavita
-          # .NET 服务端不认 --version，会直接起完整服务；timeout 包裹仅作
-          # 信息性输出（能否启动的真正验证在 TOS 真机上）
+          # The .NET server does not understand --version and would start the full service; the timeout wrapper
+          # is informational only (real startup validation happens on a real TOS device)
           timeout 20 ./chk/Kavita/Kavita --version 2>&1 | head -5 || true
 
       - name: Upload artifacts

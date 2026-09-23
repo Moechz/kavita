@@ -12,17 +12,19 @@ Grab the package for your NAS architecture from
 
 | Asset | Architecture |
 |---|---|
-| `kavita_<version>_amd64.deb` | x86_64 NAS |
-| `kavita_<version>_arm64.deb` | ARM64 (aarch64) NAS |
+| `kavita_x86_64.deb` | x86_64 NAS |
+| `kavita_aarch64.deb` | ARM64 (aarch64) NAS |
 
-Each package ships with its own `.sha256` checksum file.
+Release assets follow the official TOS naming rule `<app_id>_<platform>.deb`
+(the file name carries no version - the version is expressed by the release
+tag). Each package ships with its own `.sha256` checksum file.
 
 Install via **App Center → Manual Install** (upload the `.deb`), or on the
 command line:
 
 ```sh
-sha256sum -c kavita_<version>_amd64.deb.sha256
-sudo apt install ./kavita_<version>_amd64.deb
+sha256sum -c kavita_x86_64.deb.sha256
+sudo apt install ./kavita_x86_64.deb
 ```
 
 After installing, open the app from the TOS desktop (it opens in a new browser
@@ -82,7 +84,7 @@ verifies it against both the release checksum list and the sha256 pins in
 `config.env`; `stage` assembles the `/usr/local/kavita` tree; `verify` asserts
 the platform requirements (layout, config.ini, languages, systemd unit, nginx,
 loopback hardening, ELF architecture, provenance markers); `deb` produces
-`out/kavita_<version>_<arch>.deb` plus its `.sha256`.
+`out/kavita_<platform>.deb` (platform = `x86_64` / `aarch64`) plus its `.sha256`.
 
 ## Credits
 

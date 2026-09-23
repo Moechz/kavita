@@ -1,10 +1,10 @@
 #!/bin/bash
-# postinst - 安装/升级后处理
-# 组件树（/usr/local/kavita 下的二进制/WebUI/服务）随 deb 分发，
-# postinst 负责"派生状态"：属主、webui 解压、数据卷与配置首装引导、
-# config 符号链接自愈、系统层注册（服务+nginx）、启动与就绪检查。
-# 注：经 TOS 应用中心安装时平台也会注册 init.d 服务与 nginx 配置，
-# 本脚本的操作全部幂等，两条安装路径行为一致。
+# postinst - post-install / post-upgrade handling
+# The component tree (binaries/WebUI/service under /usr/local/kavita) ships with the deb;
+# postinst is responsible for derived state: ownership, webui extraction, data volume and first-run
+# configuration bootstrap, config symlink self-healing, system-level registration (service + nginx), startup and readiness check.
+# Note: when installed through the TOS App Center the platform also registers the init.d service and
+# nginx configuration; every operation below is idempotent, so both install paths behave the same.
 set -e
 
 APP_DIR=/usr/local/kavita
@@ -21,64 +21,64 @@ pkg_log postinst "$1" "new=@VERSION@${2:+ old=$2}"
 
 case "$1" in
   configure)
-    # 1. 用户兜底（preinst 已建；平台自动创建路径亦覆盖）
+    # 1. User fallback (already created by preinst; also covers the platform's automatic creation)
     if ! id -u $APP_USER > /dev/null 2>&1; then
       useradd --system --user-group --no-create-home --shell /usr/sbin/nologin $APP_USER 2>/dev/null || true
     fi
 
-    # 2. 文件属主（官方 postinst 模板：应用目录归运行用户；
-    #    chown -R 不跟随符号链接，不会误改 /var/lib 数据卷属主）
+    # 2. File ownership (per the official postinst template: the app directory belongs to the runtime user;
+    #    chown -R does not follow symlinks, so the /var/lib data volume ownership is untouched)
     chown -R $APP_USER:$APP_USER "$APP_DIR" 2>/dev/null || true
 
-    # 3. 解压 webui.bz2（官方模板行为；External 模式下为占位页）
+    # 3. Extract webui.bz2 (official template behaviour; a placeholder page in External mode)
     if [ -f "$APP_DIR/webui.bz2" ]; then
       ( cd "$APP_DIR" && tar -xjf webui.bz2 2>/dev/null || true )
     fi
 
-    # 4. 数据卷（数据库/封面/缓存/日志/书签/主题 + 默认库目录）
+    # 4. Data volume (database/covers/cache/logs/bookmarks/themes + default library directory)
     install -d -o $APP_USER -g $APP_USER -m 0750 \
       "$DATA_DIR" "$DATA_DIR/library"
 
-    # 5. Kavita 配置首装引导（永不覆盖用户配置）：
-    #    Kavita 首启会把 appsettings-init.json 重命名为 appsettings.json，
-    #    并自动生成 JWT TokenKey（上游 Program.cs EnsureJwtTokenKey）。
-    #    因此这里只在两者都不存在时投放 init 模板，其余交给应用自身。
+    # 5. Kavita configuration bootstrap (never overwrites a user configuration):
+    #    On first start Kavita renames appsettings-init.json to appsettings.json
+    #    and generates the JWT TokenKey itself (upstream Program.cs EnsureJwtTokenKey).
+    #    So the init template is only dropped when neither file exists; the rest is up to the app.
     if [ ! -e "$DATA_DIR/appsettings.json" ] && [ ! -e "$DATA_DIR/appsettings-init.json" ]; then
       install -m 0640 -o $APP_USER -g $APP_USER \
         "$APP_DIR/config-template/appsettings-init.json" \
         "$DATA_DIR/appsettings-init.json"
-      pkg_log postinst bootstrap "appsettings-init.json 首装"
+      pkg_log postinst bootstrap "appsettings-init.json bootstrap"
     fi
 
-    # 6. env 文件首装引导（进程级环境变量；同坑 2 规则：只在缺失时复制）
+    # 6. env file bootstrap (process-level environment; same rule as pitfall 2: copy only when missing)
     if [ ! -e "$APP_DIR/kavita.env" ] && [ -e "$APP_DIR/kavita.env.example" ]; then
       install -m 0640 -o $APP_USER -g $APP_USER \
         "$APP_DIR/kavita.env.example" "$APP_DIR/kavita.env"
-      pkg_log postinst bootstrap "kavita.env 首装"
+      pkg_log postinst bootstrap "kavita.env bootstrap"
     fi
 
-    # 7. config 符号链接自愈（deb 随包分发 bin/config -> /var/lib/kavita；
-    #    Kavita 一切状态目录均相对 CWD 的 config/ 解析，链接断则状态写进 /usr）
+    # 7. config symlink self-healing (the deb ships bin/config -> /var/lib/kavita;
+    #    every Kavita state directory is resolved relative to CWD's config/, so a broken link writes state into /usr)
     if [ ! -L "$APP_BIN/config" ]; then
       if [ -d "$APP_BIN/config" ] && [ ! -L "$APP_BIN/config" ]; then
-        # 异常路径：config 是真实目录（手工运行过 Kavita 的残留）
-        echo "警告: $APP_BIN/config 是真实目录而非符号链接。" >&2
-        echo "      如需保留其中数据，请先将其内容合并进 $DATA_DIR 后手工" >&2
-        echo "      执行: rm -rf $APP_BIN/config && ln -s $DATA_DIR $APP_BIN/config" >&2
+        # Abnormal path: config is a real directory (leftover from running Kavita manually)
+        echo "warning: $APP_BIN/config is a real directory, not a symlink." >&2
+        echo "      To keep its data, merge the contents into $DATA_DIR first, then run:" >&2
+        echo "      rm -rf $APP_BIN/config && ln -s $DATA_DIR $APP_BIN/config" >&2
       else
         rm -f "$APP_BIN/config" 2>/dev/null || true
         ln -s "$DATA_DIR" "$APP_BIN/config"
-        pkg_log postinst "config 符号链接自愈"
+        pkg_log postinst "config symlink self-healed"
       fi
     fi
     chown -h $APP_USER:$APP_USER "$APP_BIN/config" 2>/dev/null || true
 
-    # 8. 系统层注册（幂等；应用中心安装时平台也会做同样的事）
+    # 8. System-level registration (idempotent; the App Center does the same on its install path)
     install -m 0644 "$APP_DIR/init.d/kavita.service" \
       /etc/systemd/system/kavita.service
     systemctl daemon-reload
 
-    # 启用（幂等，升级路径 prerm 只停不拆故必须重 enable）并（重）启动
+    # Enable (idempotent; prerm only stops on upgrade, so re-enabling here is required) and (re)start
     systemctl enable kavita.service > /dev/null 2>&1 || true
     if [ -n "${2:-}" ]; then
       systemctl restart kavita.service 2>/dev/null || true
@@ -86,9 +86,9 @@ case "$1" in
       systemctl start kavita.service 2>/dev/null || true
     fi
 
-    # 9. nginx 路由（TOS 平台会加载 nginx/<appid>.conf，此处在系统 nginx 兜底注册）
-    # 注意：裸 location 仅在 server 上下文合法（TOS 的 conf.d 即 include 在 server 层）；
-    # 写入后立即 nginx -t 校验，失败则回滚，绝不留下导致 nginx 无法 reload 的配置
+    # 9. nginx route (the TOS platform loads nginx/<appid>.conf; this registers it in the system nginx as a fallback)
+    # Note: a bare location block is only valid in the server context (TOS includes conf.d at server level);
+    # validate with nginx -t right after writing and roll back on failure, never leaving a config that breaks nginx reload
     if command -v nginx > /dev/null 2>&1 && [ -d /etc/nginx/conf.d ]; then
       install -m 0644 "$APP_DIR/nginx/kavita.conf" \
         /etc/nginx/conf.d/kavita.conf
@@ -96,15 +96,15 @@ case "$1" in
         nginx -s reload > /dev/null 2>&1 || true
       else
         rm -f /etc/nginx/conf.d/kavita.conf
-        echo "提示: 本机 nginx 的 conf.d 不在 server 上下文，已跳过自动注册 /kavita/。" >&2
-        echo "      请把 $APP_DIR/nginx/kavita.conf 的 location 段手工加入对应 server 块。" >&2
+        echo "note: this host's nginx conf.d is not in the server context; skipped automatic /kavita/ registration." >&2
+        echo "      Please add the location block from $APP_DIR/nginx/kavita.conf to the matching server block manually." >&2
       fi
     fi
 
-    # 10. 就绪检查（坑 26：restart 成功 ≠ 就绪）。Kavita 首启要跑数据库
-    #     迁移后才开始监听，这里轮询免认证健康接口最多 60s，超时打有限快照，
-    #     不作为安装失败条件（大库升级迁移可能更久，属正常）
-    pkg_log postinst "就绪轮询开始"
+    # 10. Readiness check (pitfall 26: a successful restart is not readiness). Kavita only starts
+    #     listening after the database migration, so poll the unauthenticated health endpoint for up to 60s;
+    #     on timeout print a bounded snapshot - not an install failure condition (large-library upgrades take longer)
+    pkg_log postinst "readiness polling started"
     ready=0
     for i in $(seq 1 20); do
       if curl -fsS -o /dev/null --max-time 4 http://127.0.0.1:8500/kavita/api/health 2>/dev/null; then
@@ -117,28 +117,28 @@ case "$1" in
       sleep 3
     done
     if [ "$ready" = "1" ]; then
-      pkg_log postinst "就绪检查通过（HTTP 200）"
+      pkg_log postinst "readiness check passed (HTTP 200)"
     else
-      pkg_log postinst "就绪检查未通过（可能在跑首次迁移），状态快照如下"
-      echo "提示: Kavita 未在 60 秒内就绪（首次启动需初始化数据库，稍等片刻属正常）。" >&2
+      pkg_log postinst "readiness check did not pass (possibly still migrating); status snapshot follows"
+      echo "note: Kavita was not ready within 60 seconds (first start initialises the database; a short wait is normal)." >&2
       systemctl status kavita.service --no-pager -l 2>/dev/null | head -15 >&2 || true
-      echo "      如持续未就绪: journalctl -u kavita -n 50 --no-pager" >&2
+      echo "      If it stays unready: journalctl -u kavita -n 50 --no-pager" >&2
     fi
 
     pkg_log postinst done "@VERSION@"
     echo ""
     if [ -n "${2:-}" ]; then
-      echo "Kavita @VERSION@ 已完成升级（自 $2）。"
+      echo "Kavita @VERSION@ upgraded successfully (from $2)."
     else
-      echo "Kavita @VERSION@ 已安装。"
+      echo "Kavita @VERSION@ installed."
     fi
-    echo "  打开界面 : TOS 桌面 → Kavita 图标（新标签页打开 http://<NAS的IP>:8181/kavita/）"
-    echo "  首次使用 : 打开网页 → 创建管理员账号（首访向导，即完成初始化）"
-    echo "  建库阅读 : 网页内 Server Settings → Libraries → 添加库目录"
-    echo "             默认库目录 /var/lib/kavita/library，也可指向共享文件夹"
-    echo "             （需 kavita 用户可读: chmod -R a+rX <目录>）"
-    echo "  数据位置 : /var/lib/kavita（数据库/封面/缓存/日志）"
-    echo "  端口说明 : 仅监听 127.0.0.1:8500，不对外暴露端口（经 TOS nginx 路由访问）"
+    echo "  Open UI     : TOS desktop -> Kavita icon (opens http://<NAS-IP>:8181/kavita/ in a new tab)"
+    echo "  First use   : open the web UI -> create the admin account (the first-run wizard completes setup)"
+    echo "  Libraries   : web UI -> Server Settings -> Libraries -> add library folders"
+    echo "                default library folder /var/lib/kavita/library; a shared folder works too"
+    echo "                (must be readable by the kavita user: chmod -R a+rX <dir>)"
+    echo "  Data        : /var/lib/kavita (database / covers / cache / logs)"
+    echo "  Ports       : listens on 127.0.0.1:8500 only, no external port (accessed via the TOS nginx route)"
     echo ""
     ;;
 esac
