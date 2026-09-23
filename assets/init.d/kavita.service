@@ -1,0 +1,47 @@
+[Unit]
+Description=Kavita Reading Server (comics, manga, ebooks and magazines)
+Documentation=https://wiki.kavitareader.com
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+[Service]
+Type=simple
+User=kavita
+Group=kavita
+# Kavita 的全部状态目录（config/：数据库、封面、缓存、日志…）都相对
+# 进程 CWD 解析（上游 DirectoryService/Program.cs 用 GetCurrentDirectory）。
+# CWD 定在 /usr/local/kavita/bin（运行时资产所在），其中 config 是指向
+# /var/lib/kavita 的符号链接（deb 随包分发 + postinst 自愈），写入全部落到数据卷。
+WorkingDirectory=/usr/local/kavita/bin
+EnvironmentFile=-/usr/local/kavita/kavita.env
+# ExecStart 无任何参数可写：Kavita 不支持 CLI 配置端口/地址/前缀，
+# 全部来自 config/appsettings.json（首装由 postinst 引导：
+# Port=8500 / IpAddresses=127.0.0.1 / BaseUrl=/kavita/）。
+# 监听地址与子路径的安全兜底因此落在 appsettings 模板 + verify 断言上，
+# 而不是本单元。严禁在此引入 $ 变量（systemd 只支持基本 ${VAR} 展开）。
+ExecStart=/usr/local/kavita/bin/Kavita
+TimeoutStartSec=30
+# Kavita 收到 SIGTERM 后要排空后台任务（OnShutdown 自带 1s 缓冲）
+TimeoutStopSec=15
+# 注意：按 TOS 规范不配置 Restart/RestartSec——生命周期由应用中心统一管理
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/kavita
+# 单文件放行：Kavita 启动时会把 BaseUrl 写回 wwwroot/index.html 的
+# <base href>（UpdateBaseUrlInIndex，子路径下 SPA 资源寻址依赖它；
+# 构建期已预写同值，这里允许应用自愈，避免每次启动留 error 日志）
+ReadWritePaths=/usr/local/kavita/bin/wwwroot/index.html
+LimitNOFILE=65536
+UMask=0027
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+
+[Install]
+WantedBy=multi-user.target

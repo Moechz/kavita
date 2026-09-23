@@ -1,0 +1,18 @@
+# Build artifacts and caches
+out/
+build/
+*.deb
+*.sha256
+
+# Internal handover documents (kept locally only; the public repo ships code
+# and user-facing files — see TOS-DEB-PACKAGING-GUIDE.md pitfall 20)
+AGENTS.md
+HANDOFF.md
+PROJECT_NOTES.md
+docs/
+
+# macOS
+.DS_Store
+._*
+__pycache__/
+*.pyc

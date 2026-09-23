@@ -1,0 +1,38 @@
+#!/bin/bash
+# postrm - 删除/清除后处理（官方模板 + 本应用清理项）
+set -e
+
+MAINT_LOG=/var/log/kavita-maint.log
+mkdir -p /var/log 2>/dev/null || true
+echo "$(date '+%F %T') postrm $*" >> "$MAINT_LOG" 2>/dev/null || true
+
+systemctl daemon-reload 2>/dev/null || true
+
+if [ "$1" = "purge" ]; then
+  # 数据库、封面、缓存、日志、书签（remove 时保留，purge 全清；
+  # 漫画/书籍源文件本身在用户的库目录，不在 /var/lib/kavita 下，不受影响）
+  rm -rf /var/lib/kavita
+  # 系统层注册文件（postinst 兜底安装的）
+  rm -f /etc/systemd/system/kavita.service
+  rm -f /etc/nginx/conf.d/kavita.conf
+  # 运行用户
+  if id -u kavita > /dev/null 2>&1; then
+    userdel kavita 2>/dev/null || true
+  fi
+  systemctl daemon-reload 2>/dev/null || true
+  # nginx 路由移除后重载生效
+  if command -v nginx > /dev/null 2>&1 && nginx -t > /dev/null 2>&1; then
+    nginx -s reload > /dev/null 2>&1 || true
+  fi
+  # 注：/var/log/kavita-maint.log 保留（purge 取证用）
+  # 注：/usr/local/kavita 由 dpkg 按包清单删除（含 bin/config 符号链接）；
+  # 但 postinst 生成的派生文件不在清单里，此处补清以免目录残留：
+  #   index.html（webui 占位页解压物）、kavita.env（首装引导配置）。
+  #   bin/config（postinst 自愈重建的符号链接）也一并防御性清理
+  rm -f /usr/local/kavita/index.html
+  rm -f /usr/local/kavita/kavita.env
+  rm -f /usr/local/kavita/bin/config
+  rmdir --ignore-fail-on-non-empty /usr/local/kavita/bin /usr/local/kavita 2>/dev/null || true
+fi
+
+exit 0
